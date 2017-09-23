@@ -20,12 +20,12 @@ class Arc {
             throw new Error('radius is required!');
         }
 
-        if (!angleFrom) {
-            throw new Error('angleFrom is required!');
+        if (isNaN(angleFrom)) {
+            throw new Error('angleFrom is required and should be a number!');
         }
 
-        if (!angleTo) {
-            throw new Error('angleTo is required!');
+        if (isNaN(angleTo)) {
+            throw new Error('angleTo is required and should be a number!');
         }
 
         if (angleFrom > angleTo) {
@@ -46,7 +46,7 @@ class Arc {
 
         Object.assign(this, {
             [symStartP]: points[0],
-            [symEndP]: points.slice(-1),
+            [symEndP]: points.slice(-1)[0],
             [symRadius]: radius,
             [symAngleFrom]: angleFrom,
             [symAngleTo]: angleTo,

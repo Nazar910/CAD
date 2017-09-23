@@ -16,8 +16,35 @@ class Figure {
      * @param {Number} l - distance between half-circles on sides and center
      * @param {Number} L - distance between circles on top and bottom from center
      */
-    constructor(center, alpha, R, r, l, L) {
+    constructor({ center, alpha, R, r, l, L }) {
         //TODO: add check for all parameters
+        if (!center) {
+            throw new Error('Point center is required!');
+        }
+
+        if (!alpha) {
+            throw new Error('alpha is required!');
+        }
+
+        if (!R) {
+            throw new Error('R is required!');
+        }
+
+        if (!r) {
+            throw new Error('r is required!');
+        }
+
+        if (!l) {
+            throw new Error('l is required!');
+        }
+
+        if (!L) {
+            throw new Error('L is required!');
+        }
+
+        if (L + r > R) {
+            throw new Error('R should be bigger than L + r')
+        }
 
         Object.assign(this, {
             [symCenter]: center,

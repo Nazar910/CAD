@@ -21,11 +21,41 @@ function drawFigure(figure) {
     const manager = new CanvasManager(canvas);
 
     //draw arcs
-    manager.drawArc(center, R, -90 - alpha / 2, -90 + alpha / 2);
-    manager.drawArc(center, R, 90 - alpha / 2, 90 + alpha / 2);
+    const upperArc = manager.drawArc(center, R, -90 - alpha / 2, -90 + alpha / 2);
+    const bottomArc = manager.drawArc(center, R, 90 - alpha / 2, 90 + alpha / 2);
 
-    //compute angle for side lines
-    const angle = (180 - (180 - alpha) / 2 ) / 2;
+    //draw side line
+    const leftUnion = new Point(center.x - R, upperArc.startPoint.y + L + r);
+    const rightUnion = new Point(center.x + R, upperArc.startPoint.y + L + r);
+
+    manager.drawLine(leftUnion, upperArc.startPoint);
+    manager.drawLine(leftUnion, bottomArc.endPoint);
+
+    manager.drawLine(rightUnion, upperArc.endPoint);
+    manager.drawLine(rightUnion, bottomArc.startPoint);
+
+    //draw normal circles
+    manager.drawCircle(new Point(center.x, center.y + L), r);
+    manager.drawCircle(new Point(center.x, center.y - L), r);
+    manager.drawCircle(new Point(center.x, center.y), r);
+
+    //draw half-circles
+    const rightHalfCircle = manager.drawArc(new Point(center.x + (l + r), center.y), r, -90, 90);
+    const leftHalfCircle = manager.drawArc(new Point(center.x - (l + r), center.y), r, 90, 270);
+
+    //joinArc bound-points with line
+    manager.drawLine(rightHalfCircle.startPoint, rightHalfCircle.endPoint);
+    manager.drawLine(leftHalfCircle.startPoint, leftHalfCircle.endPoint);
+
+    //finish triangles from half-circles to the center circle
+    const centerCircleLeftPoint = new Point(center.x - r, center.y);
+    const centerCircleRightPoint = new Point(center.x + r, center.y);
+
+    manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
+    manager.drawLine(leftHalfCircle.endPoint, centerCircleLeftPoint);
+
+    manager.drawLine(rightHalfCircle.startPoint, centerCircleRightPoint);
+    manager.drawLine(rightHalfCircle.endPoint, centerCircleRightPoint);
 }
 
 
@@ -33,10 +63,20 @@ const btn = $('button#test');
 
 window.onload = () => {
     const center = new Point(300, 300);
-    const radius = 200;
+    const R = 200;
     const alpha = 60;
+    const L = 150;
+    const l = 50;
+    const r = 30;
 
-    const figure = new Figure(center, alpha, radius);
+    const figure = new Figure({
+        center,
+        alpha,
+        R,
+        L,
+        r,
+        l
+    });
 
     drawFigure(figure);
 
