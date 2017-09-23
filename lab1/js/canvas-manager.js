@@ -1,6 +1,4 @@
-const Point = require('./point');
-const Arc = require('./figures/arc');
-
+'use strict';
 const symCtx = Symbol('ctx');
 
 class CanvasManager {
@@ -38,30 +36,6 @@ class CanvasManager {
         this.ctx.moveTo(xFrom, yFrom);
         points.forEach(p => this.ctx.lineTo(p.x, p.y));
         this.ctx.stroke();
-    }
-
-    /**
-     * Draws a circle on the canvas
-     * @param {Point} center
-     * @param {Number} radius
-     */
-    drawCircle(center, radius) {
-        this.drawArc(center, radius, 0, 360);
-    }
-
-    /**
-     * Draws an arc on the canvas
-     * @param {Point} center
-     * @param {Number} radius
-     * @param {Number} angleFrom
-     * @param {Number} angleTo
-     * @returns {Arc} arc object
-     */
-    drawArc(center, radius, angleFrom, angleTo) {
-        const arc = new Arc(center, radius, angleFrom, angleTo);
-        this.drawLineFromPointsArray(arc.PointsArray);
-
-        return arc;
     }
 
     drawCoordinateLines() {

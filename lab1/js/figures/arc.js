@@ -1,3 +1,4 @@
+'use strict';
 const Point = require('./../point');
 
 const { PI } = Math;
@@ -55,7 +56,7 @@ class Arc {
         })
     }
 
-    get PointsArray() {
+    get pointsArray() {
         return this[symPoints];
     }
 

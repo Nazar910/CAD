@@ -1,3 +1,4 @@
+'use strict';
 const symX = Symbol('x');
 const symY = Symbol('y');
 

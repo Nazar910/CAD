@@ -2,6 +2,8 @@
 const $ = require('jquery');
 const Point = require('./point');
 const Figure = require('./figures/figure');
+const Circle = require('./figures/circle');
+const Arc = require('./figures/arc');
 const CanvasManager = require('./canvas-manager');
 
 const width = 1000;
@@ -21,8 +23,11 @@ function drawFigure(figure) {
     const manager = new CanvasManager(canvas);
 
     //draw arcs
-    const upperArc = manager.drawArc(center, R, -90 - alpha / 2, -90 + alpha / 2);
-    const bottomArc = manager.drawArc(center, R, 90 - alpha / 2, 90 + alpha / 2);
+    const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
+    const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
+
+    manager.drawLineFromPointsArray(upperArc.pointsArray);
+    manager.drawLineFromPointsArray(bottomArc.pointsArray);
 
     //draw side line
     const leftUnion = new Point(center.x - R, upperArc.startPoint.y + L + r);
@@ -35,13 +40,16 @@ function drawFigure(figure) {
     manager.drawLine(rightUnion, bottomArc.startPoint);
 
     //draw normal circles
-    manager.drawCircle(new Point(center.x, center.y + L), r);
-    manager.drawCircle(new Point(center.x, center.y - L), r);
-    manager.drawCircle(new Point(center.x, center.y), r);
+    manager.drawLineFromPointsArray(new Circle(new Point(center.x, center.y + L), r).pointsArray);
+    manager.drawLineFromPointsArray(new Circle(new Point(center.x, center.y - L), r).pointsArray);
+    manager.drawLineFromPointsArray(new Circle(new Point(center.x, center.y), r).pointsArray);
 
     //draw half-circles
-    const rightHalfCircle = manager.drawArc(new Point(center.x + (l + r), center.y), r, -90, 90);
-    const leftHalfCircle = manager.drawArc(new Point(center.x - (l + r), center.y), r, 90, 270);
+    const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), r, -90, 90);
+    const leftHalfCircle = new Arc(new Point(center.x - (l + r), center.y), r, 90, 270);
+
+    manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
+    manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
 
     //joinArc bound-points with line
     manager.drawLine(rightHalfCircle.startPoint, rightHalfCircle.endPoint);
