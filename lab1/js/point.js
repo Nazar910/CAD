@@ -3,13 +3,17 @@ const symX = Symbol('x');
 const symY = Symbol('y');
 
 class Point {
+    /**
+     * @param {Number} x
+     * @param {Number} y
+     */
     constructor(x, y) {
-        if (!x) {
-            throw new Error('x is required!');
+        if (isNaN(x)) {
+            throw new Error('x is required and should be a number!');
         }
 
-        if (!y) {
-            throw new Error('y is required!');
+        if (isNaN(y)) {
+            throw new Error('y is required and should be a number!');
         }
 
         Object.assign(this, {

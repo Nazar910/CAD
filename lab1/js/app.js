@@ -6,7 +6,7 @@ const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
 const CanvasManager = require('./canvas-manager');
 
-const width = 1000;
+const width = 800;
 const height = 800;
 const canvas = document.getElementById('myCanvas');
 canvas.setAttribute("width", width);
@@ -22,6 +22,10 @@ function drawFigure(figure) {
 
     const manager = new CanvasManager(canvas);
 
+    manager.lineWidth = 1;
+    manager.drawCoordinates(width, height);
+
+    manager.lineWidth = 2;
     manager.drawVerticalBarDottedLine(center, R + 20);
     manager.drawHorizontalBarDottedLine(center, R + 20);
 
@@ -81,7 +85,7 @@ function drawFigure(figure) {
 const btn = $('button#test');
 
 window.onload = () => {
-    const center = new Point(300, 300);
+    const center = new Point(350, 350);
     const R = 150;
     const alpha = 60;
     const L = 100;

@@ -1,5 +1,8 @@
 'use strict';
+const Point = require('./point');
+
 const symCtx = Symbol('ctx');
+const DEFAULT_WIDTH = 2;
 
 class CanvasManager {
     /**
@@ -12,6 +15,10 @@ class CanvasManager {
 
     get ctx() {
         return this[symCtx];
+    }
+
+    set lineWidth(value) {
+        this[symCtx].lineWidth = value;
     }
 
     /**
@@ -61,7 +68,7 @@ class CanvasManager {
     }
 
     /**
-     * Draws a vertical bar-dotted line
+     * Draws a horizontal bar-dotted line
      * @param {Point} center - center of the figure
      * @param {Number} L - distance from center to the end of bar-dotted line
      */
@@ -82,14 +89,20 @@ class CanvasManager {
 
     }
 
-    drawCoordinateLines() {
-        this.ctx.moveTo(10, 0);
-        this.ctx.lineTo(10, height);
+    /**
+     * Draws coordinate grid
+     * @param {Number} width
+     * @param {Number} height
+     */
+    drawCoordinates(width, height) {
+        const GRID_STEP = 200;
+        for (let x = 0; x < width; x += GRID_STEP) {
+            this.drawLine(new Point(x, 0), new Point(x, height));
+        }
 
-        this.ctx.moveTo(0, 10);
-        this.ctx.lineTo(width, 10);
-
-        this.ctx.stroke();
+        for (let y = 0; y < height; y += GRID_STEP) {
+            this.drawLine(new Point(0, y), new Point(width, y))
+        }
     }
 }
 
