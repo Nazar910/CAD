@@ -12,6 +12,12 @@ const symCenter = Symbol('center');
 const symPoints = Symbol('points');
 
 class Arc {
+    /**
+     * @param {Point} center
+     * @param {Number} radius
+     * @param {Number} angleFrom
+     * @param {Number} angleTo
+     */
     constructor(center, radius, angleFrom, angleTo) {
         if (!center) {
             throw new Error('Point center is required!');

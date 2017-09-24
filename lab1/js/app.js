@@ -22,6 +22,9 @@ function drawFigure(figure) {
 
     const manager = new CanvasManager(canvas);
 
+    manager.drawVerticalBarDottedLine(center, R + 20);
+    manager.drawHorizontalBarDottedLine(center, R + 20);
+
     //draw arcs
     const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
     const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
@@ -29,7 +32,7 @@ function drawFigure(figure) {
     manager.drawLineFromPointsArray(upperArc.pointsArray);
     manager.drawLineFromPointsArray(bottomArc.pointsArray);
 
-    //draw side line
+    //draw side lines
     const leftUnion = new Point(center.x - R, upperArc.startPoint.y + L + r);
     const rightUnion = new Point(center.x + R, upperArc.startPoint.y + L + r);
 
@@ -40,9 +43,17 @@ function drawFigure(figure) {
     manager.drawLine(rightUnion, bottomArc.startPoint);
 
     //draw normal circles
-    manager.drawLineFromPointsArray(new Circle(new Point(center.x, center.y + L), r).pointsArray);
-    manager.drawLineFromPointsArray(new Circle(new Point(center.x, center.y - L), r).pointsArray);
-    manager.drawLineFromPointsArray(new Circle(new Point(center.x, center.y), r).pointsArray);
+
+    const circleBottom = new Circle(new Point(center.x, center.y + L), r);
+    const circleTop = new Circle(new Point(center.x, center.y - L), r);
+    const circleMiddle = new Circle(new Point(center.x, center.y), r);
+
+    manager.drawLineFromPointsArray(circleBottom.pointsArray);
+    manager.drawLineFromPointsArray(circleTop.pointsArray);
+    manager.drawLineFromPointsArray(circleMiddle.pointsArray);
+
+    manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
+    manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
 
     //draw half-circles
     const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), r, -90, 90);
@@ -71,9 +82,9 @@ const btn = $('button#test');
 
 window.onload = () => {
     const center = new Point(300, 300);
-    const R = 200;
+    const R = 150;
     const alpha = 60;
-    const L = 150;
+    const L = 100;
     const l = 50;
     const r = 30;
 
@@ -87,41 +98,8 @@ window.onload = () => {
     });
 
     drawFigure(figure);
-
-    // const manager = new CanvasManager(canvas);
-
-    // drawCircle(center, radius)
-    // manager.drawArc(center, radius, -90, 180);
 };
 
 btn.click(() => {
-    // const p1 = new Point(0, 0);
-    // const p2 = new Point(100, 200);
-    // drawLine(p1, p2)
-    // drawCircle(new Point(500, 500), 100, 30);
-
-    // ctx.beginPath();
-    // ctx.moveTo(200.5, 200.5);
-    // drawLine(new Point(200, 200), new Point(220, 180));
-    // drawLine(new Point(220, 180), new Point(240, 160));
-    // drawLine(new Point(240, 160), new Point(260, 140));
-    // drawLine(new Point(260, 140), new Point(280, 120));
-    // drawLine(new Point(280, 120), new Point(300, 100));
-
-    // drawLine(new Point(300, 100), new Point(280, 80));
-    // drawLine(new Point(280, 80), new Point(260, 60));
-    // drawLine(new Point(260, 60), new Point(240, 40));
-    // drawLine(new Point(240, 40), new Point(220, 20));
-    // drawLine(new Point(220, 20), new Point(200, 0));
-
-    // ctx.stroke();
-
-    // ctx.beginPath();
-    // ctx.moveTo(200, 200);
-    //
-    // ctx.lineTo(220, 180);
-    //
-    // ctx.stroke();
-
 
 });

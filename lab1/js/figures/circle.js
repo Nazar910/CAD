@@ -23,6 +23,10 @@ class Circle {
     get pointsArray() {
         return this[symPoints];
     }
+
+    get center() {
+        return this[symCenter];
+    }
 }
 
 module.exports = Circle;
