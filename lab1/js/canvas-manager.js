@@ -1,5 +1,6 @@
 'use strict';
 const Point = require('./point');
+const Arc = require('./figures/arc');
 
 const symCtx = Symbol('ctx');
 const symWidth = Symbol('width');
@@ -134,6 +135,7 @@ class CanvasManager {
         this.ctx.rotate(-Math.PI/2);
         this.ctx.textAlign = 'center';
         //workaround because context is rotated (x -> -y, y -> x)
+        this.ctx.font = "15px Arial";
         this.ctx.fillText(text, -point.y, point.x - 5);
         this.ctx.restore();
     }
@@ -213,7 +215,34 @@ class CanvasManager {
             : toPoint.x - deltaXMiddle;
 
         const middlePoint = new Point(middleX, fromPoint.y);
+        this.ctx.font = "15px Arial";
         this.ctx.fillText(String(size), middlePoint.x, middlePoint.y - 5);
+    }
+
+    /**
+     * Draws a size for an angle
+     * @param {Point} center
+     * @param {Number} R
+     * @param {Number} angleFrom
+     * @param {Number} angleTo
+     * @param {Number} offset
+     * @param {Number} size
+     */
+    drawSizeForAngle(center, R, angleFrom, angleTo, offset, size) {
+        const angleArc = new Arc(center, R + offset, angleFrom, angleTo);
+        this.drawLineFromPointsArray(angleArc.pointsArray);
+
+        const fromPoint = angleArc.startPoint;
+        const toPoint = angleArc.endPoint;
+
+        //draw arrows
+        this.drawLine(new Point(fromPoint.x, fromPoint.y), new Point(fromPoint.x - 10, fromPoint.y + 2));
+        this.drawLine(new Point(fromPoint.x, fromPoint.y), new Point(fromPoint.x - 8, fromPoint.y + 8));
+
+        this.drawLine(new Point(toPoint.x, toPoint.y), new Point(toPoint.x + 10, toPoint.y + 2));
+        this.drawLine(new Point(toPoint.x, toPoint.y), new Point(toPoint.x + 8, toPoint.y + 8));
+
+        this.ctx.fillText(String(size), center.x - 30, center.y + R + 15);
     }
 }
 

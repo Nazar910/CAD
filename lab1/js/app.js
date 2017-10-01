@@ -95,7 +95,7 @@ class App {
      * @param {Figure} figure
      */
     [symDrawSizes](figure) {
-        const { center, L, K, R, r, l, rK } = figure;
+        const { center, L, K, R, r, l, rK, alpha } = figure;
 
         const toPoint = new Point(center.x, center.y - L);
         //L size
@@ -118,6 +118,8 @@ class App {
             new Point(center.x + r + l + rK, center.y),
             new Point(center.x + r + l, center.y),
             -(R + 30), rK);
+        //alpha
+        this.manager.drawSizeForAngle(center, R, 90 - alpha / 2, 90 + alpha / 2, 20, alpha);
     }
 
     /**

@@ -19,6 +19,8 @@ class Figure {
      * @param {Number} r - radius of small circle inside
      * @param {Number} l - distance between half-circles on sides and center
      * @param {Number} L - distance between circles on top and bottom from center
+     * @param {Number} K - distance between center and join of side lines
+     * @param {Number} rK - radius of the half-circles
      */
     constructor({ center, alpha, R, r, L, l, K, rK }) {
         //TODO: add check for all parameters
