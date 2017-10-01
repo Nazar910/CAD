@@ -95,7 +95,7 @@ class App {
      * @param {Figure} figure
      */
     [symDrawSizes](figure) {
-        const { center, L, K, R, r, l } = figure;
+        const { center, L, K, R, r, l, rK } = figure;
 
         const toPoint = new Point(center.x, center.y - L);
         //L size
@@ -105,6 +105,19 @@ class App {
         //l size
         const lSizeStartP = new Point(center.x - r, center.y);
         this.manager.drawHorizontalSize(lSizeStartP, new Point(lSizeStartP.x - l, center.y), -(R + 50), l);
+        //R
+        this.manager.drawVerticalSize(center, new Point(center.x, center.y - R), -(R + 30), R);
+        //2r
+        this.manager.drawVerticalSize(
+            new Point(center.x, center.y + L + r),
+            new Point(center.x, center.y + L - r),
+            K + 30, 2 * r);
+
+        //rK
+        this.manager.drawHorizontalSize(
+            new Point(center.x + r + l + rK, center.y),
+            new Point(center.x + r + l, center.y),
+            -(R + 30), rK);
     }
 
     /**
