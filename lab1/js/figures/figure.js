@@ -1,10 +1,14 @@
 'use strict';
+const Point = require('../point');
+
 const symCenter = Symbol('center');
 const symAlpha = Symbol('alpha');
 const symR = Symbol('R');
 const symr = Symbol('r');
 const syml = Symbol('l');
 const symL = Symbol('L');
+const symK = Symbol('K');
+const symRK = Symbol('rK');
 
 class Figure {
     /**
@@ -16,9 +20,9 @@ class Figure {
      * @param {Number} l - distance between half-circles on sides and center
      * @param {Number} L - distance between circles on top and bottom from center
      */
-    constructor({ center, alpha, R, r, l, L }) {
+    constructor({ center, alpha, R, r, L, l, K, rK }) {
         //TODO: add check for all parameters
-        if (!center) {
+        if (!center || !(center instanceof Point)) {
             throw new Error('Point center is required!');
         }
 
@@ -42,8 +46,16 @@ class Figure {
             throw new Error('L is required!');
         }
 
+        if (!K) {
+            throw new Error('K is required!');
+        }
+
         if (L + r > R) {
             throw new Error('R should be bigger than L + r')
+        }
+
+        if (K < rK + l + r) {
+            throw new Error('K should be bigger than rK + l + r')
         }
 
         Object.assign(this, {
@@ -53,6 +65,8 @@ class Figure {
             [symr]: r,
             [syml]: l,
             [symL]: L,
+            [symK]: K,
+            [symRK]: rK
         })
     }
 
@@ -78,6 +92,14 @@ class Figure {
 
     get L() {
         return this[symL];
+    }
+
+    get K() {
+        return this[symK];
+    }
+
+    get rK() {
+        return this[symRK];
     }
 }
 

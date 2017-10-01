@@ -2,7 +2,8 @@
 const Point = require('./point');
 
 const symCtx = Symbol('ctx');
-const DEFAULT_WIDTH = 2;
+const symWidth = Symbol('width');
+const symHeight = Symbol('height');
 
 class CanvasManager {
     /**
@@ -10,11 +11,24 @@ class CanvasManager {
      * gets by document.getElementById (not jquery)
      */
     constructor(canvas) {
-        this[symCtx] = canvas.getContext('2d');
+
+        Object.assign(this, {
+            [symCtx]: canvas.getContext('2d'),
+            [symWidth]: canvas.width,
+            [symHeight]: canvas.height
+        });
     }
 
     get ctx() {
         return this[symCtx];
+    }
+
+    get canvasWidth() {
+        return this[symWidth]
+    }
+
+    get canvasHeight() {
+        return this[symHeight]
     }
 
     set lineWidth(value) {
@@ -96,6 +110,10 @@ class CanvasManager {
      */
     drawCoordinates(width, height) {
         const GRID_STEP = 200;
+
+        this.ctx.fillText('200px', 170, 10);
+        this.ctx.fillText('200px', 10, 190);
+
         for (let x = 0; x < width; x += GRID_STEP) {
             this.drawLine(new Point(x, 0), new Point(x, height));
         }
@@ -103,6 +121,99 @@ class CanvasManager {
         for (let y = 0; y < height; y += GRID_STEP) {
             this.drawLine(new Point(0, y), new Point(width, y))
         }
+    }
+
+    /**
+     * Draws a vertical text
+     * @param {String} text
+     * @param {Point} point
+     */
+    writeVerticalText(text, point) {
+        this.ctx.save();
+        this.ctx.translate(0, 0);
+        this.ctx.rotate(-Math.PI/2);
+        this.ctx.textAlign = 'center';
+        //workaround because context is rotated (x -> -y, y -> x)
+        this.ctx.fillText(text, -point.y, point.x - 5);
+        this.ctx.restore();
+    }
+
+    /**
+     * Draws a vertical size for a line
+     * @param {Point} startPoint
+     * @param {Point} endPoint
+     * @param {Number} offset
+     * @param {Number} size
+     */
+    drawVerticalSize(startPoint, endPoint, offset, size) {
+        if (startPoint.x !== endPoint.x) {
+            throw new Error('X should be equal for starting and ending points!')
+        }
+
+        //draw line
+        //as `x` is similar for both startP and endP
+        const { x } = startPoint;
+        const fromPoint = new Point(x + offset, startPoint.y);
+        const toPoint = new Point(x + offset, endPoint.y);
+        this.drawLine(fromPoint, toPoint);
+        //draw arrows
+        this.drawLine(new Point(fromPoint.x, fromPoint.y - 3), new Point(fromPoint.x - 3, fromPoint.y - 10));
+        this.drawLine(new Point(fromPoint.x, fromPoint.y - 3), new Point(fromPoint.x + 3, fromPoint.y - 10));
+
+        this.drawLine(new Point(toPoint.x, toPoint.y + 3), new Point(toPoint.x - 3, toPoint.y + 10));
+        this.drawLine(new Point(toPoint.x, toPoint.y + 3), new Point(toPoint.x + 3, toPoint.y + 10));
+
+        //draw side-lines
+        const offsetForSideLines = offset + (offset < 0 ? -10 : 10);
+        this.drawLine(startPoint, new Point(startPoint.x + offsetForSideLines, startPoint.y));
+        this.drawLine(endPoint, new Point(endPoint.x + offsetForSideLines, endPoint.y));
+
+        const deltaYMiddle = Math.abs(fromPoint.y - toPoint.y) / 2;
+        const middleY = fromPoint.y > toPoint.y
+                            ? fromPoint.y - deltaYMiddle
+                            : toPoint.y - deltaYMiddle;
+
+        const middlePoint = new Point(fromPoint.x, middleY);
+        this.writeVerticalText(String(size), middlePoint);
+    }
+
+    /**
+     * Draws a horizontal size for a line
+     * @param {Point} startPoint
+     * @param {Point} endPoint
+     * @param {Number} offset
+     * @param {Number} size
+     */
+    drawHorizontalSize(startPoint, endPoint, offset, size) {
+        if (startPoint.y !== endPoint.y) {
+            throw new Error('Y should be equal for starting and ending points!')
+        }
+
+        //draw line
+        //as `y` is similar for both startP and endP
+        const { y } = startPoint;
+        const fromPoint = new Point(startPoint.x, y + offset);
+        const toPoint = new Point(endPoint.x, y + offset);
+        this.drawLine(fromPoint, toPoint);
+        //draw arrows
+        this.drawLine(new Point(fromPoint.x - 3, fromPoint.y), new Point(fromPoint.x - 10, fromPoint.y - 3));
+        this.drawLine(new Point(fromPoint.x - 3, fromPoint.y), new Point(fromPoint.x - 10, fromPoint.y + 3));
+
+        this.drawLine(new Point(toPoint.x + 3, toPoint.y), new Point(toPoint.x + 10, toPoint.y - 3));
+        this.drawLine(new Point(toPoint.x + 3, toPoint.y), new Point(toPoint.x + 10, toPoint.y + 3));
+
+        //draw side-lines
+        const offsetForSideLines = offset + (offset < 0 ? -10 : 10);
+        this.drawLine(startPoint, new Point(startPoint.x, startPoint.y + offsetForSideLines));
+        this.drawLine(endPoint, new Point(endPoint.x, endPoint.y + offsetForSideLines));
+
+        const deltaXMiddle = Math.abs(fromPoint.x - toPoint.x) / 2;
+        const middleX = fromPoint.x > toPoint.x
+            ? fromPoint.x - deltaXMiddle
+            : toPoint.x - deltaXMiddle;
+
+        const middlePoint = new Point(middleX, fromPoint.y);
+        this.ctx.fillText(String(size), middlePoint.x, middlePoint.y - 5);
     }
 }
 

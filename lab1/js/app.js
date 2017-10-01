@@ -1,109 +1,150 @@
 'use strict';
-const $ = require('jquery');
 const Point = require('./point');
 const Figure = require('./figures/figure');
 const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
-const CanvasManager = require('./canvas-manager');
 
-const width = 800;
-const height = 800;
-const canvas = document.getElementById('myCanvas');
-canvas.setAttribute("width", width);
-canvas.setAttribute("height", height);
+const symManager = Symbol('manager');
+const symDrawOuterLine = Symbol('drawOuterLine');
+const symDrawFullCircles = Symbol('drawFullCircles');
+const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
+const symDrawSizes = Symbol('drawSize');
 
-/**
- * Draws a figure
- * @param {Figure} figure
- */
-function drawFigure(figure) {
+class App {
+    /**
+     * @param {CanvasManager} manager
+     */
+    constructor(manager) {
+        this[symManager] = manager;
+    }
 
-    const { center, alpha, R, r, l, L } = figure;
+    get manager() {
+        return this[symManager];
+    }
 
-    const manager = new CanvasManager(canvas);
+    /**
+     * @param {Figure} figure
+     */
+    [symDrawOuterLine](figure) {
+        const { center, alpha, R, K } = figure;
+        //draw arcs
+        const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
+        const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
 
-    manager.lineWidth = 1;
-    manager.drawCoordinates(width, height);
+        this.manager.drawLineFromPointsArray(upperArc.pointsArray);
+        this.manager.drawLineFromPointsArray(bottomArc.pointsArray);
 
-    manager.lineWidth = 2;
-    manager.drawVerticalBarDottedLine(center, R + 20);
-    manager.drawHorizontalBarDottedLine(center, R + 20);
+        //draw side lines
+        const leftUnion = new Point(center.x - K, center.y);
+        const rightUnion = new Point(center.x + K, center.y);
 
-    //draw arcs
-    const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
-    const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
+        this.manager.drawLine(leftUnion, upperArc.startPoint);
+        this.manager.drawLine(leftUnion, bottomArc.endPoint);
 
-    manager.drawLineFromPointsArray(upperArc.pointsArray);
-    manager.drawLineFromPointsArray(bottomArc.pointsArray);
+        this.manager.drawLine(rightUnion, upperArc.endPoint);
+        this.manager.drawLine(rightUnion, bottomArc.startPoint);
+    }
 
-    //draw side lines
-    const leftUnion = new Point(center.x - R, upperArc.startPoint.y + L + r);
-    const rightUnion = new Point(center.x + R, upperArc.startPoint.y + L + r);
+    /**
+     * @param {Figure} figure
+     */
+    [symDrawFullCircles](figure) {
+        const { center, L, r } = figure;
+        //draw normal circles
+        const circleBottom = new Circle(new Point(center.x, center.y + L), r);
+        const circleTop = new Circle(new Point(center.x, center.y - L), r);
+        const circleMiddle = new Circle(new Point(center.x, center.y), r);
 
-    manager.drawLine(leftUnion, upperArc.startPoint);
-    manager.drawLine(leftUnion, bottomArc.endPoint);
+        this.manager.drawLineFromPointsArray(circleBottom.pointsArray);
+        this.manager.drawLineFromPointsArray(circleTop.pointsArray);
+        this.manager.drawLineFromPointsArray(circleMiddle.pointsArray);
 
-    manager.drawLine(rightUnion, upperArc.endPoint);
-    manager.drawLine(rightUnion, bottomArc.startPoint);
+        this.manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
+        this.manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
+    }
 
-    //draw normal circles
+    /**
+     * @param {Figure} figure
+     */
+    [symDrawConeLikeFigures](figure) {
+        const { center, r, l, rK } = figure;
+        //draw half-circles
+        const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), rK, -90, 90);
+        const leftHalfCircle = new Arc(new Point(center.x - (l + r), center.y), rK, 90, 270);
 
-    const circleBottom = new Circle(new Point(center.x, center.y + L), r);
-    const circleTop = new Circle(new Point(center.x, center.y - L), r);
-    const circleMiddle = new Circle(new Point(center.x, center.y), r);
+        this.manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
+        this.manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
 
-    manager.drawLineFromPointsArray(circleBottom.pointsArray);
-    manager.drawLineFromPointsArray(circleTop.pointsArray);
-    manager.drawLineFromPointsArray(circleMiddle.pointsArray);
+        //joinArc bound-points with line
+        this.manager.drawLine(rightHalfCircle.startPoint, rightHalfCircle.endPoint);
+        this.manager.drawLine(leftHalfCircle.startPoint, leftHalfCircle.endPoint);
 
-    manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
-    manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
+        //finish triangles from half-circles to the center circle
+        const centerCircleLeftPoint = new Point(center.x - r, center.y);
+        const centerCircleRightPoint = new Point(center.x + r, center.y);
 
-    //draw half-circles
-    const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), r, -90, 90);
-    const leftHalfCircle = new Arc(new Point(center.x - (l + r), center.y), r, 90, 270);
+        this.manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
+        this.manager.drawLine(leftHalfCircle.endPoint, centerCircleLeftPoint);
 
-    manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
-    manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
+        this.manager.drawLine(rightHalfCircle.startPoint, centerCircleRightPoint);
+        this.manager.drawLine(rightHalfCircle.endPoint, centerCircleRightPoint);
+    }
 
-    //joinArc bound-points with line
-    manager.drawLine(rightHalfCircle.startPoint, rightHalfCircle.endPoint);
-    manager.drawLine(leftHalfCircle.startPoint, leftHalfCircle.endPoint);
+    /**
+     * Draws size by a given figure parameters
+     * @param {Figure} figure
+     */
+    [symDrawSizes](figure) {
+        const { center, L, K, R, r, l } = figure;
 
-    //finish triangles from half-circles to the center circle
-    const centerCircleLeftPoint = new Point(center.x - r, center.y);
-    const centerCircleRightPoint = new Point(center.x + r, center.y);
+        const toPoint = new Point(center.x, center.y - L);
+        //L size
+        this.manager.drawVerticalSize(center, toPoint, K + 30, L);
+        //K size
+        this.manager.drawHorizontalSize(center, new Point(center.x - K, center.y), R + 50, K);
+        //l size
+        const lSizeStartP = new Point(center.x - r, center.y);
+        this.manager.drawHorizontalSize(lSizeStartP, new Point(lSizeStartP.x - l, center.y), -(R + 50), l);
+    }
 
-    manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
-    manager.drawLine(leftHalfCircle.endPoint, centerCircleLeftPoint);
+    /**
+     * Draws a figure
+     * @param {Figure} figure
+     */
+    drawFigure(figure) {
 
-    manager.drawLine(rightHalfCircle.startPoint, centerCircleRightPoint);
-    manager.drawLine(rightHalfCircle.endPoint, centerCircleRightPoint);
+        if (!figure || !(figure instanceof Figure)) {
+            throw new Error('figure of type Figure required!')
+        }
+
+        const { center, R } = figure;
+
+        //dimensions
+        //form for input parameters
+        //add 200px for x and y axises
+        //picture with
+
+        this.manager.lineWidth = 1;
+        this.manager.drawCoordinates(this.manager.canvasWidth, this.manager.canvasHeight);
+        //draw sizes
+        this[symDrawSizes](figure);
+
+        this.manager.lineWidth = 2;
+        this.manager.drawVerticalBarDottedLine(center, R + 20);
+        this.manager.drawHorizontalBarDottedLine(center, R + 20);
+
+        //draw outer arcs and side lines
+        this[symDrawOuterLine](figure);
+
+        //draw full circles
+        this[symDrawFullCircles](figure);
+
+        //draw cone like figures
+        this[symDrawConeLikeFigures](figure);
+
+    }
+
+
 }
 
-
-const btn = $('button#test');
-
-window.onload = () => {
-    const center = new Point(350, 350);
-    const R = 150;
-    const alpha = 60;
-    const L = 100;
-    const l = 50;
-    const r = 30;
-
-    const figure = new Figure({
-        center,
-        alpha,
-        R,
-        L,
-        r,
-        l
-    });
-
-    drawFigure(figure);
-};
-
-btn.click(() => {
-
-});
+module.exports = App;
