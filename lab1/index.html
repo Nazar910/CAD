@@ -4,12 +4,25 @@
     <meta charset="UTF-8">
     <title>Encrypthor</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-
+    <div class="alert alert-danger" role="alert" id="errors"></div>
     <canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
     </canvas>
-    <button id="test">Test</button>
+    <form id="my-form">
+        xCenter: <input type="number" name="xCenter" id="xCenter"/>
+        yCenter: <input type="number" name="yCenter" id="yCenter"/><br/>
+        R: <input type="number" name="R" id="R1"/>
+        alpha: <input type="number" name="alpha" id="alpha"/><br/>
+        l: <input type="number" name="l" id="l1"/>
+        L: <input type="number" name="L" id="L2"/><br/>
+        r: <input type="number" name="r" id="r2"/>
+        rK: <input type="number" name="rK" id="rK"/><br/>
+        K: <input type="number" name="K" id="K"/>
+        <button type="submit">Draw</button>
+    </form>
+    <button id="test-data">Test data</button>
     <script src="build/public/app.bundle.js"></script>
 </body>
 </html>

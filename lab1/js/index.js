@@ -11,36 +11,52 @@ const canvas = document.getElementById('myCanvas');
 canvas.setAttribute("width", width);
 canvas.setAttribute("height", height);
 
-const btn = $('button#test');
+const $form = $('#my-form');
+const $errors = $('div#errors');
+const $btnTestData = $('button#test-data');
 
 window.onload = () => {
-    const canvasManager = new CanvasManager(canvas);
-
-    const center = new Point(350, 350);
-    const R = 150;
-    const alpha = 60;
-    const L = 100;
-    const l = 50;
-    const r = 30;
-    const rK = 30;
-    const K = 130;
-
-    const figure = new Figure({
-        center,
-        alpha,
-        R,
-        r,
-        L,
-        l,
-        K,
-        rK
-    });
-
-    const app = new App(canvasManager);
-
-    app.drawFigure(figure);
+    $errors.hide();
 };
 
-btn.click(() => {
+$btnTestData.click(() => {
+    //added numbers to the ids because of case-insensitivity
+    const testData = {
+        xCenter: 350,
+        yCenter: 350,
+        R1: 150,
+        alpha: 60,
+        l1: 50,
+        L2: 100,
+        r2: 30,
+        rK: 30,
+        K: 130
+    };
 
+    $form.find('input').val(function () {
+        return testData[this.id];
+    })
+});
+
+$form.submit(e => {
+    const data = $form.serializeArray().reduce((obj, {name, value}) => Object.assign(obj, {
+            [name]: +value
+    }), {});
+    console.log(data);
+    e.preventDefault();
+
+    const canvasManager = new CanvasManager(canvas);
+
+    try {
+        data.center = new Point(data.xCenter, data.yCenter);
+
+        const figure = new Figure(data);
+
+        const app = new App(canvasManager);
+
+        app.drawFigure(figure);
+    } catch (e) {
+        $errors.show();
+        $errors.append(`<h3>Oops we've got an error: ${e.message}</h3>`);
+    }
 });
