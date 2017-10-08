@@ -41,7 +41,6 @@ class CanvasManager {
      * @param {Point} p2 coordinates of point2
      */
     drawLine(p1, p2) {
-        this.ctx.beginPath();
         this.ctx.moveTo(p1.x, p1.y);
         this.ctx.lineTo(p2.x, p2.y);
         this.ctx.stroke();
@@ -55,7 +54,6 @@ class CanvasManager {
         const xFrom = points[0].x;
         const yFrom = points[0].y;
 
-        this.ctx.beginPath();
         this.ctx.moveTo(xFrom, yFrom);
         points.forEach(p => this.ctx.lineTo(p.x, p.y));
         this.ctx.stroke();
@@ -113,7 +111,25 @@ class CanvasManager {
     drawCoordinates(width, height) {
         const GRID_STEP = 200;
 
+        //x axis
+        const xAxisFromPoint = new Point(0, 5);
+        const xAxisToPoint = new Point(100, 5);
+        this.drawLine(xAxisFromPoint, xAxisToPoint);
+        //draw arrows
+        this.drawLine(new Point(xAxisToPoint.x - 3, xAxisToPoint.y), new Point(xAxisToPoint.x - 10, xAxisToPoint.y - 3));
+        this.drawLine(new Point(xAxisToPoint.x - 3, xAxisToPoint.y), new Point(xAxisToPoint.x - 10, xAxisToPoint.y + 3));
+
+        //y axis
+        const yAxisFromPoint = new Point(5, 0);
+        const yAxisToPoint = new Point(5, 100);
+        this.drawLine(yAxisFromPoint, yAxisToPoint);
+        //draw arrows
+        this.drawLine(new Point(yAxisToPoint.x, yAxisToPoint.y + 3), new Point(yAxisToPoint.x - 3, yAxisToPoint.y - 10));
+        this.drawLine(new Point(yAxisToPoint.x, yAxisToPoint.y + 3), new Point(yAxisToPoint.x + 3, yAxisToPoint.y - 10));
+
         this.ctx.font = "10px Arial";
+        this.ctx.fillText('x', 110, 10);
+        this.ctx.fillText('y', 10, 110);
         this.ctx.fillText('200px', 170, 10);
         this.ctx.fillText('200px', 10, 190);
 
@@ -154,6 +170,7 @@ class CanvasManager {
             throw new Error('X should be equal for starting and ending points!')
         }
 
+        this.ctx.lineWidth = 1;
         //draw line
         //as `x` is similar for both startP and endP
         const { x } = startPoint;
@@ -193,6 +210,7 @@ class CanvasManager {
             throw new Error('Y should be equal for starting and ending points!')
         }
 
+        this.ctx.lineWidth = 1;
         //draw line
         //as `y` is similar for both startP and endP
         const { y } = startPoint;
@@ -253,6 +271,7 @@ class CanvasManager {
      */
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.ctx.beginPath();
     }
 }
 

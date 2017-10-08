@@ -30,6 +30,7 @@ class Figure {
             throw new Error('Point center is required!');
         }
 
+        //TODO: check for negative values
         if (!alpha) {
             throw new Error('alpha is required!');
         }

@@ -134,7 +134,7 @@ class App {
 
         const { center, R } = figure;
 
-        //dimensions
+        //sizes
         //form for input parameters
         //add 200px for x and y axises
 
@@ -143,7 +143,6 @@ class App {
             this[symDrawSizes](figure);
         }
 
-        this.manager.lineWidth = 2;
         this.manager.drawVerticalBarDottedLine(center, R + 20);
         this.manager.drawHorizontalBarDottedLine(center, R + 20);
 

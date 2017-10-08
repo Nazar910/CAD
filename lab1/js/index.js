@@ -18,11 +18,10 @@ const $sizes = $('#sizes');
 const $img = $('#variant-image');
 const $showImgBtn = $('button#show-img');
 
-let showImg = false;
+let showImg = true;
 
 window.onload = () => {
     $errors.hide();
-    $img.hide();
 };
 
 $showImgBtn.click(() => {
