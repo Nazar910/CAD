@@ -9,6 +9,7 @@ const syml = Symbol('l');
 const symL = Symbol('L');
 const symK = Symbol('K');
 const symRK = Symbol('rK');
+const symSizes = Symbol('sizes');
 
 class Figure {
     /**
@@ -21,8 +22,9 @@ class Figure {
      * @param {Number} L - distance between circles on top and bottom from center
      * @param {Number} K - distance between center and join of side lines
      * @param {Number} rK - radius of the half-circles
+     * @param {Boolean} sizes - true if sizes are required (false otherwise)
      */
-    constructor({ center, alpha, R, r, L, l, K, rK }) {
+    constructor({ center, alpha, R, r, L, l, K, rK, sizes }) {
         //TODO: add check for all parameters
         if (!center || !(center instanceof Point)) {
             throw new Error('Point center is required!');
@@ -68,7 +70,8 @@ class Figure {
             [syml]: l,
             [symL]: L,
             [symK]: K,
-            [symRK]: rK
+            [symRK]: rK,
+            [symSizes]: sizes
         })
     }
 
@@ -102,6 +105,10 @@ class Figure {
 
     get rK() {
         return this[symRK];
+    }
+
+    get sizesNeeded() {
+        return this[symSizes]
     }
 }
 

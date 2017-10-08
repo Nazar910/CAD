@@ -3,8 +3,8 @@ const Point = require('./point');
 const Arc = require('./figures/arc');
 
 const symCtx = Symbol('ctx');
-const symWidth = Symbol('width');
-const symHeight = Symbol('height');
+const symCanvas = Symbol('height');
+const symRefreshContext = Symbol('height');
 
 class CanvasManager {
     /**
@@ -14,9 +14,8 @@ class CanvasManager {
     constructor(canvas) {
 
         Object.assign(this, {
-            [symCtx]: canvas.getContext('2d'),
-            [symWidth]: canvas.width,
-            [symHeight]: canvas.height
+            [symCanvas]: canvas,
+            [symCtx]: canvas.getContext('2d')
         });
     }
 
@@ -25,11 +24,11 @@ class CanvasManager {
     }
 
     get canvasWidth() {
-        return this[symWidth]
+        return this[symCanvas].width;
     }
 
     get canvasHeight() {
-        return this[symHeight]
+        return this[symCanvas].height;
     }
 
     set lineWidth(value) {
@@ -42,6 +41,7 @@ class CanvasManager {
      * @param {Point} p2 coordinates of point2
      */
     drawLine(p1, p2) {
+        this.ctx.beginPath();
         this.ctx.moveTo(p1.x, p1.y);
         this.ctx.lineTo(p2.x, p2.y);
         this.ctx.stroke();
@@ -55,6 +55,7 @@ class CanvasManager {
         const xFrom = points[0].x;
         const yFrom = points[0].y;
 
+        this.ctx.beginPath();
         this.ctx.moveTo(xFrom, yFrom);
         points.forEach(p => this.ctx.lineTo(p.x, p.y));
         this.ctx.stroke();
@@ -229,6 +230,7 @@ class CanvasManager {
      * @param {Number} size
      */
     drawSizeForAngle(center, R, angleFrom, angleTo, offset, size) {
+        //TODO: ugly
         const angleArc = new Arc(center, R + offset, angleFrom, angleTo);
         this.drawLineFromPointsArray(angleArc.pointsArray);
 
@@ -243,6 +245,13 @@ class CanvasManager {
         this.drawLine(new Point(toPoint.x, toPoint.y), new Point(toPoint.x + 8, toPoint.y + 8));
 
         this.ctx.fillText(String(size), center.x - 30, center.y + R + 15);
+    }
+
+    /**
+     * Clears the whole canvas
+     */
+    clearCanvas() {
+        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     }
 }
 

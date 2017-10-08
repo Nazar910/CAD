@@ -8,12 +8,13 @@ const App = require('./app');
 const width = 800;
 const height = 800;
 const canvas = document.getElementById('myCanvas');
-canvas.setAttribute("width", width);
-canvas.setAttribute("height", height);
+canvas.setAttribute('width', String(width));
+canvas.setAttribute('height', String(height));
 
 const $form = $('#my-form');
 const $errors = $('div#errors');
 const $btnTestData = $('button#test-data');
+const $sizes = $('#sizes');
 
 window.onload = () => {
     $errors.hide();
@@ -39,15 +40,20 @@ $btnTestData.click(() => {
 });
 
 $form.submit(e => {
-    const data = $form.serializeArray().reduce((obj, {name, value}) => Object.assign(obj, {
+    const data = $form.serializeArray()
+        .reduce((obj, {name, value}) => Object.assign(obj, {
             [name]: +value
-    }), {});
-    console.log(data);
+        }), {});
     e.preventDefault();
 
+    data.sizes = $sizes.is(':checked');
+
     const canvasManager = new CanvasManager(canvas);
+    canvasManager.clearCanvas();
 
     try {
+        //adding this because Figure constructor require 'center' prop
+        //which is basically pair of xCenter and yCenter
         data.center = new Point(data.xCenter, data.yCenter);
 
         const figure = new Figure(data);
@@ -57,6 +63,6 @@ $form.submit(e => {
         app.drawFigure(figure);
     } catch (e) {
         $errors.show();
-        $errors.append(`<h3>Oops we've got an error: ${e.message}</h3>`);
+        $errors.append(`<h3>Oops we'ves got an error: <strong>${e.message}</strong></h3>`);
     }
 });
