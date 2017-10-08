@@ -23,16 +23,16 @@ class Arc {
             throw new Error('Point center is required!');
         }
 
-        if (!radius) {
-            throw new Error('radius is required!');
+        if (isNaN(radius) || radius < 0) {
+            throw new Error('radius is required, should be a number and should be greater than 0!');
         }
 
-        if (isNaN(angleFrom)) {
-            throw new Error('angleFrom is required and should be a number!');
+        if (isNaN(angleFrom)  || angleFrom < 0) {
+            throw new Error('angleFrom is required, should be a number and should be greater than 0!');
         }
 
-        if (isNaN(angleTo)) {
-            throw new Error('angleTo is required and should be a number!');
+        if (isNaN(angleTo)  || angleTo < 0) {
+            throw new Error('angleTo is required, should be a number and should be greater than 0!');
         }
 
         if (angleFrom > angleTo) {

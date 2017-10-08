@@ -134,10 +134,6 @@ class App {
 
         const { center, R } = figure;
 
-        //sizes
-        //form for input parameters
-        //add 200px for x and y axises
-
         if (figure.sizesNeeded) {
             //draw sizes
             this[symDrawSizes](figure);

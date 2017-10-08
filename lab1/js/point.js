@@ -8,12 +8,12 @@ class Point {
      * @param {Number} y
      */
     constructor(x, y) {
-        if (isNaN(x)) {
-            throw new Error('x is required and should be a number!');
+        if (isNaN(x) || x < 0) {
+            throw new Error('x is required, should be a number and should be greater than 0!');
         }
 
-        if (isNaN(y)) {
-            throw new Error('y is required and should be a number!');
+        if (isNaN(y) || y < 0) {
+            throw new Error('y is required, should be a number and should be greater than 0!');
         }
 
         Object.assign(this, {

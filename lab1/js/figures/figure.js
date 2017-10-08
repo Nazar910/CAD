@@ -30,29 +30,28 @@ class Figure {
             throw new Error('Point center is required!');
         }
 
-        //TODO: check for negative values
-        if (!alpha) {
-            throw new Error('alpha is required!');
+        if (!alpha || alpha < 0) {
+            throw new Error('alpha is required and should be greater than 0!');
         }
 
-        if (!R) {
-            throw new Error('R is required!');
+        if (!R || R < 0) {
+            throw new Error('R is required and should be greater than 0!');
         }
 
-        if (!r) {
-            throw new Error('r is required!');
+        if (!r || r < 0) {
+            throw new Error('r is required and should be greater than 0!');
         }
 
-        if (!l) {
-            throw new Error('l is required!');
+        if (!l || l < 0) {
+            throw new Error('l is required and should be greater than 0!');
         }
 
-        if (!L) {
-            throw new Error('L is required!');
+        if (!L || L < 0) {
+            throw new Error('L is required  and should be greater than 0!');
         }
 
-        if (!K) {
-            throw new Error('K is required!');
+        if (!K || K < 0) {
+            throw new Error('K is required and should be greater than 0!');
         }
 
         if (L + r > R) {

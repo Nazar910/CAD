@@ -54,6 +54,8 @@ $form.submit(e => {
             [name]: +value
         }), {});
     e.preventDefault();
+    $errors.empty();
+    $errors.hide();
 
     data.sizes = $sizes.is(':checked');
 
