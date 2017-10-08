@@ -113,6 +113,7 @@ class CanvasManager {
     drawCoordinates(width, height) {
         const GRID_STEP = 200;
 
+        this.ctx.font = "10px Arial";
         this.ctx.fillText('200px', 170, 10);
         this.ctx.fillText('200px', 10, 190);
 

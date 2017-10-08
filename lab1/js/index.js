@@ -15,10 +15,20 @@ const $form = $('#my-form');
 const $errors = $('div#errors');
 const $btnTestData = $('button#test-data');
 const $sizes = $('#sizes');
+const $img = $('#variant-image');
+const $showImgBtn = $('button#show-img');
+
+let showImg = false;
 
 window.onload = () => {
     $errors.hide();
+    $img.hide();
 };
+
+$showImgBtn.click(() => {
+    showImg = !showImg;
+    $img.toggle(showImg);
+});
 
 $btnTestData.click(() => {
     //added numbers to the ids because of case-insensitivity
@@ -50,6 +60,9 @@ $form.submit(e => {
 
     const canvasManager = new CanvasManager(canvas);
     canvasManager.clearCanvas();
+
+    canvasManager.lineWidth = 1;
+    canvasManager.drawCoordinates(width, height);
 
     try {
         //adding this because Figure constructor require 'center' prop

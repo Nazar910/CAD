@@ -137,11 +137,6 @@ class App {
         //dimensions
         //form for input parameters
         //add 200px for x and y axises
-        //picture with
-
-        //TODO: move higher
-        this.manager.lineWidth = 1;
-        this.manager.drawCoordinates(this.manager.canvasWidth, this.manager.canvasHeight);
 
         if (figure.sizesNeeded) {
             //draw sizes
