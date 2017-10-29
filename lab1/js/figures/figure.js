@@ -10,6 +10,8 @@ const symL = Symbol('L');
 const symK = Symbol('K');
 const symRK = Symbol('rK');
 const symSizes = Symbol('sizes');
+const affinePoint = Symbol('affinePoint');
+const projectivePoint = Symbol('projectivePoint');
 
 class Figure {
     /**
@@ -23,8 +25,10 @@ class Figure {
      * @param {Number} K - distance between center and join of side lines
      * @param {Number} rK - radius of the half-circles
      * @param {Boolean} sizes - true if sizes are required (false otherwise)
+     * @param {Boolean} isAffine - flag that signals if coordinates should be converted to affine coordinates
+     * @param {Boolean} isProjective - flag that signals if coordinates should be converted to projective coordinates
      */
-    constructor({ center, alpha, R, r, L, l, K, rK, sizes }) {
+    constructor({ center, alpha, R, r, L, l, K, rK, sizes, isAffine, isProjective }) {
         //TODO: add check for all parameters
         if (!center || !(center instanceof Point)) {
             throw new Error('Point center is required!');
@@ -71,8 +75,14 @@ class Figure {
             [symL]: L,
             [symK]: K,
             [symRK]: rK,
-            [symSizes]: sizes
+            [symSizes]: sizes,
+            [affinePoint]: isAffine,
+            [projectivePoint]: isProjective
         })
+    }
+
+    convertEachPoint(cb) {
+        //return new Figure
     }
 
     get center() {
@@ -109,6 +119,14 @@ class Figure {
 
     get sizesNeeded() {
         return this[symSizes]
+    }
+
+    get affinePoint() {
+        return this[affinePoint];
+    }
+
+    get projectivePoint() {
+        return this[projectivePoint]
     }
 }
 

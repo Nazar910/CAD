@@ -9,6 +9,8 @@ const symDrawOuterLine = Symbol('drawOuterLine');
 const symDrawFullCircles = Symbol('drawFullCircles');
 const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
 const symDrawSizes = Symbol('drawSize');
+const convertToAffine = Symbol('convertToAffine');
+const convertToProjective = Symbol('convertToProjective');
 
 class App {
     /**
@@ -26,7 +28,7 @@ class App {
      * @param {Figure} figure
      */
     [symDrawOuterLine](figure) {
-        const { center, alpha, R, K } = figure;
+        const {center, alpha, R, K} = figure;
         //draw arcs
         const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
         const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
@@ -49,7 +51,7 @@ class App {
      * @param {Figure} figure
      */
     [symDrawFullCircles](figure) {
-        const { center, L, r } = figure;
+        const {center, L, r} = figure;
         //draw normal circles
         const circleBottom = new Circle(new Point(center.x, center.y + L), r);
         const circleTop = new Circle(new Point(center.x, center.y - L), r);
@@ -67,7 +69,7 @@ class App {
      * @param {Figure} figure
      */
     [symDrawConeLikeFigures](figure) {
-        const { center, r, l, rK } = figure;
+        const {center, r, l, rK} = figure;
         //draw half-circles
         const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), rK, -90, 90);
         const leftHalfCircle = new Arc(new Point(center.x - (l + r), center.y), rK, 90, 270);
@@ -95,7 +97,7 @@ class App {
      * @param {Figure} figure
      */
     [symDrawSizes](figure) {
-        const { center, L, K, R, r, l, rK, alpha } = figure;
+        const {center, L, K, R, r, l, rK, alpha} = figure;
 
         const toPoint = new Point(center.x, center.y - L);
         //L size
@@ -132,11 +134,48 @@ class App {
             throw new Error('figure of type Figure required!')
         }
 
-        const { center, R } = figure;
+        const {center, R} = figure;
 
         if (figure.sizesNeeded) {
             //draw sizes
             this[symDrawSizes](figure);
+        }
+
+        if (figure.affinePoint) {
+            const {R1x, R1y, R2x, R2y} = figure;
+
+            /**
+             * Converts a point to affine
+             * @param {Point} p - point to be converted
+             * @return {Point}
+             */
+            const convertToAffine = (p) => {
+                return new Point(R1x * p.x + R1y * p.y, R2x * p.x + R2y * p.y);
+            };
+
+            //convert affine point
+            figure = figure.convertEachPoint(convertToAffine);
+        }
+
+        if (figure.projectivePoint) {
+            const {RxP, RyP, xWeight, yWeight, zWeight} = figure;
+
+            /**
+             * Converts a point to a projective
+             * @param {Point} p - point to be converted
+             * @return {Point}
+             */
+            const convertToProjective = (p) => {
+                const resX
+                    = (xWeight * p.x * RxP.x + yWeight * p.y * RxP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
+                const resY
+                    = (xWeight * p.x * RyP.x + yWeight * p.y * RyP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
+
+                return new Point(resX, resY);
+            };
+
+            //convert projective point
+            figure = figure.convertEachPoint(convertToProjective);
         }
 
         this.manager.drawVerticalBarDottedLine(center, R + 20);
