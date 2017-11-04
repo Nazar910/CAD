@@ -62,6 +62,18 @@ class Arc {
         })
     }
 
+    convertPoints(convertFunc) {
+        const startP = convertFunc(this.startPoint);
+        const endP = convertFunc(this.endPoint);
+        const points = this.pointsArray.map(convertFunc);
+
+        Object.assign(this, {
+            [symStartP]: startP,
+            [symEndP]: endP,
+            [symPoints]: points
+        });
+    }
+
     get pointsArray() {
         return this[symPoints];
     }

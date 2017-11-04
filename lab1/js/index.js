@@ -4,6 +4,7 @@ const Figure = require('./figures/figure');
 const Point = require('./point');
 const CanvasManager = require('./canvas-manager');
 const App = require('./app');
+const Affine = require('./affine');
 
 const width = 800;
 const height = 800;
@@ -72,7 +73,7 @@ $form.submit(e => {
 
         const figure = new Figure(data);
 
-        const app = new App(canvasManager);
+        const app = new App(canvasManager, new Affine(0.5, 0, 0.5, 0));
 
         app.drawFigure(figure);
     } catch (e) {

@@ -1,4 +1,5 @@
 'use strict';
+const assert = require('assert');
 const Point = require('../point');
 
 const symCenter = Symbol('center');
@@ -10,81 +11,142 @@ const symL = Symbol('L');
 const symK = Symbol('K');
 const symRK = Symbol('rK');
 const symSizes = Symbol('sizes');
-const affinePoint = Symbol('affinePoint');
-const projectivePoint = Symbol('projectivePoint');
+
+class Builder {
+    /**
+     * @param {Point} centerP
+     */
+    center(centerP) {
+        assert(centerP instanceof Point, 'Point center should be instance of Point');
+        this.centerP = centerP;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} alphaAngle - angle of the arc
+     */
+    alpha(alphaAngle) {
+        assert(alphaAngle > 0, 'alpha should be greater than 0!');
+        this.alphaAngle = alphaAngle;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} Rn - radius of the big arc
+     */
+    R(Rn) {
+        assert(Rn > 0, 'R should be greater than 0!');
+        this.Rn = Rn;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} rN - radius of small circle inside
+     */
+    r(rN) {
+        assert(rN > 0, 'r should be greater than 0!');
+        this.rN = rN;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} lN - distance between half-circles on sides and center
+     */
+    l(lN) {
+        assert(lN > 0, 'l should be greater than 0!');
+        this.lN = lN;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} Ln - distance between circles on top and bottom from center
+     */
+    L(Ln) {
+        assert(Ln > 0, 'L should be greater than 0!');
+        this.Ln = Ln;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} Kn - distance between center and join of side lines
+     */
+    K(Kn) {
+        assert(Kn > 0, 'K should be greater than 0!');
+        this.Kn = Kn;
+
+        return this;
+    }
+
+    /**
+     * @param {Number} rKn - radius of the half-circles
+     */
+    rK(rKn) {
+        assert(rKn > 0, 'rK should be greater than 0!');
+        this.rKn = rKn;
+
+        return this;
+    }
+
+    /**
+     * @param {Boolean} sizesRequired - true if sizes are required (false otherwise)
+     */
+    sizes(sizesRequired) {
+        this.sizesRequired = sizesRequired;
+
+        return this;
+    }
+
+    /**
+     * method that builds up a figure object and does some additional checks
+     * @return {Figure}
+     */
+    build() {
+        const { centerP, alphaAngle, Rn, rN, lN, Ln, Kn, rKn, sizesRequired } = this;
+
+        //check required fields
+        assert(alphaAngle, 'alpha is required!');
+        assert(Rn, 'R is required!');
+        assert(centerP, 'Point center is required!');
+        assert(rN, 'r is required!');
+        assert(lN, 'l is required!');
+        assert(Ln, 'L is required!');
+        assert(Kn, 'K is required!');
+        assert(rKn, 'rK is required!');
+
+        //check additional conditions
+        assert(Ln + rN > Rn, 'R should be bigger than L + r');
+        assert(rKn + lN + rN > Kn, 'K should be bigger than rK + l + r');
+
+        const figure = new Figure();
+
+        Object.assign(figure, {
+            [symCenter]: centerP,
+            [symAlpha]: alphaAngle,
+            [symR]: Rn,
+            [symr]: rN,
+            [syml]: lN,
+            [symL]: Ln,
+            [symK]: Kn,
+            [symRK]: rKn,
+            [symSizes]: sizesRequired
+        });
+
+        return figure;
+    }
+
+}
 
 class Figure {
-    /**
-     * Creates a figure
-     * @param {Point} center
-     * @param {Number} alpha - angle of the arc
-     * @param {Number} R - radius of the big arc
-     * @param {Number} r - radius of small circle inside
-     * @param {Number} l - distance between half-circles on sides and center
-     * @param {Number} L - distance between circles on top and bottom from center
-     * @param {Number} K - distance between center and join of side lines
-     * @param {Number} rK - radius of the half-circles
-     * @param {Boolean} sizes - true if sizes are required (false otherwise)
-     * @param {Boolean} isAffine - flag that signals if coordinates should be converted to affine coordinates
-     * @param {Boolean} isProjective - flag that signals if coordinates should be converted to projective coordinates
-     */
-    constructor({ center, alpha, R, r, L, l, K, rK, sizes, isAffine, isProjective }) {
-        //TODO: add check for all parameters
-        if (!center || !(center instanceof Point)) {
-            throw new Error('Point center is required!');
-        }
-
-        if (!alpha || alpha < 0) {
-            throw new Error('alpha is required and should be greater than 0!');
-        }
-
-        if (!R || R < 0) {
-            throw new Error('R is required and should be greater than 0!');
-        }
-
-        if (!r || r < 0) {
-            throw new Error('r is required and should be greater than 0!');
-        }
-
-        if (!l || l < 0) {
-            throw new Error('l is required and should be greater than 0!');
-        }
-
-        if (!L || L < 0) {
-            throw new Error('L is required  and should be greater than 0!');
-        }
-
-        if (!K || K < 0) {
-            throw new Error('K is required and should be greater than 0!');
-        }
-
-        if (L + r > R) {
-            throw new Error('R should be bigger than L + r')
-        }
-
-        if (K < rK + l + r) {
-            throw new Error('K should be bigger than rK + l + r')
-        }
-
-        Object.assign(this, {
-            [symCenter]: center,
-            [symAlpha]: alpha,
-            [symR]: R,
-            [symr]: r,
-            [syml]: l,
-            [symL]: L,
-            [symK]: K,
-            [symRK]: rK,
-            [symSizes]: sizes,
-            [affinePoint]: isAffine,
-            [projectivePoint]: isProjective
-        })
-    }
-
-    convertEachPoint(cb) {
-        //return new Figure
-    }
-
+    static get Builder() {
+        return new Builder();
+    } 
+    
     get center() {
         return this[symCenter];
     }
@@ -119,14 +181,6 @@ class Figure {
 
     get sizesNeeded() {
         return this[symSizes]
-    }
-
-    get affinePoint() {
-        return this[affinePoint];
-    }
-
-    get projectivePoint() {
-        return this[projectivePoint]
     }
 }
 

@@ -9,15 +9,61 @@ const symDrawOuterLine = Symbol('drawOuterLine');
 const symDrawFullCircles = Symbol('drawFullCircles');
 const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
 const symDrawSizes = Symbol('drawSize');
-const convertToAffine = Symbol('convertToAffine');
-const convertToProjective = Symbol('convertToProjective');
+const symShouldBeConverted = Symbol('shouldBeConverted');
+
+/**
+ * Converts a point to affine
+ * @param {Point} p - point to be converted
+ * @return {Point}
+ */
+function convertToAffine(p) {
+    const {R1x, R1y, R2x, R2y} = this;
+    debugger;
+    return new Point(R1x * p.x + R1y * p.y, R2x * p.x + R2y * p.y);
+}
+
+/**
+ * Converts a point to a projective
+ * @param {Point} p - point to be converted
+ * @return {Point}
+ */
+function convertToProjective(p) {
+    const {RxP, RyP, xWeight, yWeight, zWeight} = this;
+
+    const resX
+        = (xWeight * p.x * RxP.x + yWeight * p.y * RxP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
+    const resY
+        = (xWeight * p.x * RyP.x + yWeight * p.y * RyP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
+
+    return new Point(resX, resY);
+}
 
 class App {
     /**
      * @param {CanvasManager} manager
+     * @param {Affine} affine
+     * @param {Projective} projective
      */
-    constructor(manager) {
+    constructor(manager, affine, projective) {
         this[symManager] = manager;
+
+        let shouldBeConverted = null;
+
+        if (affine) {
+            shouldBeConverted = convertToAffine.bind(affine);
+        }
+
+        if (projective) {
+            shouldBeConverted = convertToProjective.bind(projective);
+        }
+
+        Object.assign(this, {
+            [symShouldBeConverted]: shouldBeConverted
+        })
+    }
+
+    get shouldBeConverted() {
+        return this[symShouldBeConverted];
     }
 
     get manager() {
@@ -32,6 +78,11 @@ class App {
         //draw arcs
         const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
         const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
+
+        if (this.shouldBeConverted) {
+            upperArc.convertPoints(this.shouldBeConverted);
+            bottomArc.convertPoints(this.shouldBeConverted);
+        }
 
         this.manager.drawLineFromPointsArray(upperArc.pointsArray);
         this.manager.drawLineFromPointsArray(bottomArc.pointsArray);
@@ -61,8 +112,9 @@ class App {
         this.manager.drawLineFromPointsArray(circleTop.pointsArray);
         this.manager.drawLineFromPointsArray(circleMiddle.pointsArray);
 
-        this.manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
-        this.manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
+        //TODO: uncomment when there is possible to draw under angle
+        // this.manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
+        // this.manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
     }
 
     /**
@@ -141,45 +193,9 @@ class App {
             this[symDrawSizes](figure);
         }
 
-        if (figure.affinePoint) {
-            const {R1x, R1y, R2x, R2y} = figure;
-
-            /**
-             * Converts a point to affine
-             * @param {Point} p - point to be converted
-             * @return {Point}
-             */
-            const convertToAffine = (p) => {
-                return new Point(R1x * p.x + R1y * p.y, R2x * p.x + R2y * p.y);
-            };
-
-            //convert affine point
-            figure = figure.convertEachPoint(convertToAffine);
-        }
-
-        if (figure.projectivePoint) {
-            const {RxP, RyP, xWeight, yWeight, zWeight} = figure;
-
-            /**
-             * Converts a point to a projective
-             * @param {Point} p - point to be converted
-             * @return {Point}
-             */
-            const convertToProjective = (p) => {
-                const resX
-                    = (xWeight * p.x * RxP.x + yWeight * p.y * RxP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
-                const resY
-                    = (xWeight * p.x * RyP.x + yWeight * p.y * RyP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
-
-                return new Point(resX, resY);
-            };
-
-            //convert projective point
-            figure = figure.convertEachPoint(convertToProjective);
-        }
-
-        this.manager.drawVerticalBarDottedLine(center, R + 20);
-        this.manager.drawHorizontalBarDottedLine(center, R + 20);
+        //TODO: uncomment this and draw dotted lines under angle
+        // this.manager.drawVerticalBarDottedLine(center, R + 20);
+        // this.manager.drawHorizontalBarDottedLine(center, R + 20);
 
         //draw outer arcs and side lines
         this[symDrawOuterLine](figure);
