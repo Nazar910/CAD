@@ -17,18 +17,48 @@ const $form = $('#my-form');
 const $errors = $('div#errors');
 const $btnTestData = $('button#test-data');
 const $sizes = $('#sizes');
+
 const $img = $('#variant-image');
+const $affine = $('#affine');
+const $projective = $('#projective');
+
 const $showImgBtn = $('button#show-img');
+const $showAffine = $('button#show-affine');
+const $showProjective = $('button#show-projective');
 
 let showImg = true;
+let showAffine = false;
+let showProjective = false;
 
 window.onload = () => {
     $errors.hide();
+    $affine.hide();
+    $projective.hide();
 };
 
 $showImgBtn.click(() => {
     showImg = !showImg;
     $img.toggle(showImg);
+});
+
+$showAffine.click(() => {
+    if (showProjective) {
+        showProjective = !showProjective;
+        $projective.toggle(showProjective);
+    }
+
+    showAffine = !showAffine;
+    $affine.toggle(showAffine);
+});
+
+$showProjective.click(() => {
+    if (showAffine) {
+        showAffine = !showAffine;
+        $affine.toggle(showAffine);
+    }
+
+    showProjective = !showProjective;
+    $projective.toggle(showProjective);
 });
 
 $btnTestData.click(() => {
@@ -57,7 +87,7 @@ $form.submit(e => {
         }), {});
     e.preventDefault();
     $errors.empty();
-    $errors.hide(); 
+    $errors.hide();
 
     data.sizes = $sizes.is(':checked');
 
@@ -77,8 +107,28 @@ $form.submit(e => {
             .sizes(data.sizes)
             .build();
 
-        const app = new App(canvasManager, null, new Projective(
-            new Point(1000, 3), new Point(6, 900), 2.5, 1.5, 500));
+        let affine = null;
+        let projective = null;
+
+        if (showAffine) {
+            const { Rx1, Ry1, Rx2, Ry2 } = data;
+            affine = new Affine(Rx1, Ry1, Rx2, Ry2)
+        }
+
+        if (showProjective) {
+            const { RxPx, RxPy, RyPx, RyPy, xWeight, yWeight, zWeight } = data;
+            projective = new Projective(
+                new Point(RxPx, RxPy),
+                new Point(RyPx, RyPy),
+                xWeight, yWeight, zWeight)
+        }
+
+        const app = new App(canvasManager,
+            affine,
+            projective
+            // new Affine(0.5, 0, 0.5, 0.5),
+            // new Projective(new Point(1000, 3), new Point(6, 900), 2.5, 1.5, 500)
+        );
 
         app.drawFigure(figure);
     } catch (e) {
