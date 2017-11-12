@@ -17,8 +17,8 @@ const symShouldBeConverted = Symbol('shouldBeConverted');
  * @return {Point}
  */
 function convertToAffine(p) {
-    const {R1x, R1y, R2x, R2y} = this;
-    debugger;
+    const { R1x, R1y, R2x, R2y } = this;
+
     return new Point(R1x * p.x + R1y * p.y, R2x * p.x + R2y * p.y);
 }
 
@@ -28,7 +28,7 @@ function convertToAffine(p) {
  * @return {Point}
  */
 function convertToProjective(p) {
-    const {RxP, RyP, xWeight, yWeight, zWeight} = this;
+    const { RxP, RyP, xWeight, yWeight, zWeight } = this;
 
     const resX
         = (xWeight * p.x * RxP.x + yWeight * p.y * RxP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
@@ -79,17 +79,29 @@ class App {
         const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
         const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
 
+        console.log('Before');
+        console.log(upperArc.pointsArray);
+
+        //fixme
         if (this.shouldBeConverted) {
             upperArc.convertPoints(this.shouldBeConverted);
             bottomArc.convertPoints(this.shouldBeConverted);
         }
 
+        console.log('After');
+        console.log(upperArc.pointsArray);
         this.manager.drawLineFromPointsArray(upperArc.pointsArray);
         this.manager.drawLineFromPointsArray(bottomArc.pointsArray);
 
         //draw side lines
-        const leftUnion = new Point(center.x - K, center.y);
-        const rightUnion = new Point(center.x + K, center.y);
+        let leftUnion = new Point(center.x - K, center.y);
+        let rightUnion = new Point(center.x + K, center.y);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            leftUnion = this.shouldBeConverted(leftUnion);
+            rightUnion = this.shouldBeConverted(rightUnion);
+        }
 
         this.manager.drawLine(leftUnion, upperArc.startPoint);
         this.manager.drawLine(leftUnion, bottomArc.endPoint);
@@ -107,6 +119,15 @@ class App {
         const circleBottom = new Circle(new Point(center.x, center.y + L), r);
         const circleTop = new Circle(new Point(center.x, center.y - L), r);
         const circleMiddle = new Circle(new Point(center.x, center.y), r);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            circleBottom.convertPoints(this.shouldBeConverted);
+            circleTop.convertPoints(this.shouldBeConverted);
+            circleMiddle.convertPoints(this.shouldBeConverted);
+        }
+
+        debugger;
 
         this.manager.drawLineFromPointsArray(circleBottom.pointsArray);
         this.manager.drawLineFromPointsArray(circleTop.pointsArray);
@@ -126,6 +147,14 @@ class App {
         const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), rK, -90, 90);
         const leftHalfCircle = new Arc(new Point(center.x - (l + r), center.y), rK, 90, 270);
 
+        //fixme
+        if (this.shouldBeConverted) {
+            rightHalfCircle.convertPoints(this.shouldBeConverted);
+            leftHalfCircle.convertPoints(this.shouldBeConverted);
+        }
+
+        debugger;
+
         this.manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
         this.manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
 
@@ -134,8 +163,16 @@ class App {
         this.manager.drawLine(leftHalfCircle.startPoint, leftHalfCircle.endPoint);
 
         //finish triangles from half-circles to the center circle
-        const centerCircleLeftPoint = new Point(center.x - r, center.y);
-        const centerCircleRightPoint = new Point(center.x + r, center.y);
+        let centerCircleLeftPoint = new Point(center.x - r, center.y);
+        let centerCircleRightPoint = new Point(center.x + r, center.y);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            centerCircleLeftPoint = this.shouldBeConverted(centerCircleLeftPoint);
+            centerCircleRightPoint = this.shouldBeConverted(centerCircleRightPoint);
+        }
+
+        debugger;
 
         this.manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
         this.manager.drawLine(leftHalfCircle.endPoint, centerCircleLeftPoint);
@@ -186,7 +223,7 @@ class App {
             throw new Error('figure of type Figure required!')
         }
 
-        const {center, R} = figure;
+        const { center, R } = figure;
 
         if (figure.sizesNeeded) {
             //draw sizes

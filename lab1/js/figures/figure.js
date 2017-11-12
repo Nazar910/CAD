@@ -120,8 +120,8 @@ class Builder {
         assert(rKn, 'rK is required!');
 
         //check additional conditions
-        assert(Ln + rN > Rn, 'R should be bigger than L + r');
-        assert(rKn + lN + rN > Kn, 'K should be bigger than rK + l + r');
+        assert(Ln + rN < Rn, 'R should be bigger than L + r');
+        assert(rKn + lN + rN < Kn, 'K should be bigger than rK + l + r');
 
         const figure = new Figure();
 

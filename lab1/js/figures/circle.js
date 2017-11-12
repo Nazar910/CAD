@@ -20,6 +20,16 @@ class Circle {
         })
     }
 
+    convertPoints(convertFunc) {
+        const center = convertFunc(this.center);
+        const points = this.pointsArray.map(convertFunc);
+
+        Object.assign(this, {
+            [symCenter]: center,
+            [symPoints]: points
+        });
+    }
+
     get pointsArray() {
         return this[symPoints];
     }

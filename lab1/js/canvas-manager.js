@@ -65,7 +65,7 @@ class CanvasManager {
      * @param {Number} L - distance from center to the end of bar-dotted line
      */
     drawVerticalBarDottedLine(center, L) {
-        const dashBar = [5 ,20]; //DASH, BAR
+        const dashBar = [5, 20]; //DASH, BAR
 
         const yFrom = center.y - L;
         const yTo = center.y + L;
@@ -87,7 +87,7 @@ class CanvasManager {
      * @param {Number} L - distance from center to the end of bar-dotted line
      */
     drawHorizontalBarDottedLine(center, L) {
-        const dashBar = [5 ,20]; //DASH, BAR
+        const dashBar = [5, 20]; //DASH, BAR
 
         const xFrom = center.x - L;
         const xTo = center.x + L;

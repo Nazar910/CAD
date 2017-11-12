@@ -67,13 +67,19 @@ $form.submit(e => {
     canvasManager.drawCoordinates(width, height);
 
     try {
-        //adding this because Figure constructor require 'center' prop
-        //which is basically pair of xCenter and yCenter
-        data.center = new Point(data.xCenter, data.yCenter);
+        const figure = Figure.Builder
+            .center(new Point(data.xCenter, data.yCenter))
+            .alpha(data.alpha)
+            .R(data.R)
+            .r(data.r)
+            .l(data.l)
+            .L(data.L)
+            .rK(data.rK)
+            .K(data.K)
+            .sizes(data.sizes)
+            .build();
 
-        const figure = new Figure(data);
-
-        const app = new App(canvasManager, new Affine(0.5, 0, 0.5, 0));
+        const app = new App(canvasManager, new Affine(0.5, 0.5, 0, 1));
 
         app.drawFigure(figure);
     } catch (e) {
