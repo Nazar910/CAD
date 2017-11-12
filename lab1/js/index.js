@@ -5,6 +5,7 @@ const Point = require('./point');
 const CanvasManager = require('./canvas-manager');
 const App = require('./app');
 const Affine = require('./affine');
+const Projective = require('./projective');
 
 const width = 800;
 const height = 800;
@@ -56,15 +57,12 @@ $form.submit(e => {
         }), {});
     e.preventDefault();
     $errors.empty();
-    $errors.hide();
+    $errors.hide(); 
 
     data.sizes = $sizes.is(':checked');
 
     const canvasManager = new CanvasManager(canvas);
     canvasManager.clearCanvas();
-
-    canvasManager.lineWidth = 1;
-    canvasManager.drawCoordinates(width, height);
 
     try {
         const figure = Figure.Builder
@@ -79,7 +77,8 @@ $form.submit(e => {
             .sizes(data.sizes)
             .build();
 
-        const app = new App(canvasManager, new Affine(0.5, 0.5, 0, 1));
+        const app = new App(canvasManager, null, new Projective(
+            new Point(1000, 3), new Point(6, 900), 2.5, 1.5, 500));
 
         app.drawFigure(figure);
     } catch (e) {

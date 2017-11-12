@@ -3,6 +3,7 @@ const Point = require('./point');
 const Figure = require('./figures/figure');
 const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
+const Grid = require('./grid');
 
 const symManager = Symbol('manager');
 const symDrawOuterLine = Symbol('drawOuterLine');
@@ -10,6 +11,8 @@ const symDrawFullCircles = Symbol('drawFullCircles');
 const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
 const symDrawSizes = Symbol('drawSize');
 const symShouldBeConverted = Symbol('shouldBeConverted');
+const symDrawCoordinates = Symbol('shouldBeConverted');
+const GRID_STEP = 200;
 
 /**
  * Converts a point to affine
@@ -127,8 +130,6 @@ class App {
             circleMiddle.convertPoints(this.shouldBeConverted);
         }
 
-        debugger;
-
         this.manager.drawLineFromPointsArray(circleBottom.pointsArray);
         this.manager.drawLineFromPointsArray(circleTop.pointsArray);
         this.manager.drawLineFromPointsArray(circleMiddle.pointsArray);
@@ -153,8 +154,6 @@ class App {
             leftHalfCircle.convertPoints(this.shouldBeConverted);
         }
 
-        debugger;
-
         this.manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
         this.manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
 
@@ -171,8 +170,6 @@ class App {
             centerCircleLeftPoint = this.shouldBeConverted(centerCircleLeftPoint);
             centerCircleRightPoint = this.shouldBeConverted(centerCircleRightPoint);
         }
-
-        debugger;
 
         this.manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
         this.manager.drawLine(leftHalfCircle.endPoint, centerCircleLeftPoint);
@@ -213,11 +210,26 @@ class App {
         this.manager.drawSizeForAngle(center, R, 90 - alpha / 2, 90 + alpha / 2, 20, alpha);
     }
 
+    [symDrawCoordinates]() {
+        const grid = new Grid(this.manager.canvasWidth, this.manager.canvasHeight, GRID_STEP);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            grid.convertPoints(this.shouldBeConverted);
+        }
+
+        this.manager.lineWidth = 1;
+        grid.pointsTupletsArray.forEach(({from, to}) => this.manager.drawLine(from, to))
+    }
+
     /**
      * Draws a figure
      * @param {Figure} figure
      */
     drawFigure(figure) {
+
+        // this.manager.drawCoordinates();
+        this[symDrawCoordinates]();
 
         if (!figure || !(figure instanceof Figure)) {
             throw new Error('figure of type Figure required!')

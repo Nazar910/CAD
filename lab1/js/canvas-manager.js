@@ -4,7 +4,6 @@ const Arc = require('./figures/arc');
 
 const symCtx = Symbol('ctx');
 const symCanvas = Symbol('height');
-const symRefreshContext = Symbol('height');
 
 class CanvasManager {
     /**
@@ -105,31 +104,32 @@ class CanvasManager {
 
     /**
      * Draws coordinate grid
-     * @param {Number} width
-     * @param {Number} height
      */
-    drawCoordinates(width, height) {
+    drawCoordinates() {
+        const width = this.canvasWidth;
+        const height = this.canvasHeight;
+
         const GRID_STEP = 200;
 
         //x axis
-        const xAxisFromPoint = new Point(0, 5);
+/*        const xAxisFromPoint = new Point(0, 5);
         const xAxisToPoint = new Point(100, 5);
-        this.drawLine(xAxisFromPoint, xAxisToPoint);
+        this.drawLine(xAxisFromPoint, xAxisToPoint);*/
         //draw arrows
-        this.drawLine(new Point(xAxisToPoint.x - 3, xAxisToPoint.y), new Point(xAxisToPoint.x - 10, xAxisToPoint.y - 3));
-        this.drawLine(new Point(xAxisToPoint.x - 3, xAxisToPoint.y), new Point(xAxisToPoint.x - 10, xAxisToPoint.y + 3));
+        /*this.drawLine(new Point(xAxisToPoint.x - 3, xAxisToPoint.y), new Point(xAxisToPoint.x - 10, xAxisToPoint.y - 3));
+        this.drawLine(new Point(xAxisToPoint.x - 3, xAxisToPoint.y), new Point(xAxisToPoint.x - 10, xAxisToPoint.y + 3));*/
 
         //y axis
         const yAxisFromPoint = new Point(5, 0);
         const yAxisToPoint = new Point(5, 100);
         this.drawLine(yAxisFromPoint, yAxisToPoint);
-        //draw arrows
-        this.drawLine(new Point(yAxisToPoint.x, yAxisToPoint.y + 3), new Point(yAxisToPoint.x - 3, yAxisToPoint.y - 10));
-        this.drawLine(new Point(yAxisToPoint.x, yAxisToPoint.y + 3), new Point(yAxisToPoint.x + 3, yAxisToPoint.y - 10));
 
+        //draw arrows
+        // this.drawLine(new Point(yAxisToPoint.x, yAxisToPoint.y + 3), new Point(yAxisToPoint.x - 3, yAxisToPoint.y - 10));
+        // this.drawLine(new Point(yAxisToPoint.x, yAxisToPoint.y + 3), new Point(yAxisToPoint.x + 3, yAxisToPoint.y - 10));
         this.ctx.font = "10px Arial";
-        this.ctx.fillText('x', 110, 10);
-        this.ctx.fillText('y', 10, 110);
+        // this.ctx.fillText('x', 110, 10);
+        // this.ctx.fillText('y', 10, 110);
         this.ctx.fillText('200px', 170, 10);
         this.ctx.fillText('200px', 10, 190);
 
