@@ -4,6 +4,7 @@ const Figure = require('./figures/figure');
 const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
 const Grid = require('./grid');
+const Arrow = require('./figures/arrow');
 
 const symManager = Symbol('manager');
 const symDrawOuterLine = Symbol('drawOuterLine');
@@ -12,6 +13,7 @@ const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
 const symDrawSizes = Symbol('drawSize');
 const symShouldBeConverted = Symbol('shouldBeConverted');
 const symDrawCoordinates = Symbol('shouldBeConverted');
+const symDrawLemniscate = Symbol('drawLemniscate');
 const GRID_STEP = 200;
 
 /**
@@ -213,13 +215,34 @@ class App {
     [symDrawCoordinates]() {
         const grid = new Grid(this.manager.canvasWidth, this.manager.canvasHeight, GRID_STEP);
 
+        const xArrow = new Arrow(new Point(0, 10), new Point(30, 10), 'x');
+        const yArrow = new Arrow(new Point(10, 0), new Point(10, 30), 'y');
+
         //fixme
         if (this.shouldBeConverted) {
             grid.convertPoints(this.shouldBeConverted);
+            xArrow.convertPoints(this.shouldBeConverted);
+            yArrow.convertPoints(this.shouldBeConverted);
         }
 
         this.manager.lineWidth = 1;
-        grid.pointsTupletsArray.forEach(({from, to}) => this.manager.drawLine(from, to))
+        grid.pointsTupletsArray.forEach(({from, to}) => this.manager.drawLine(from, to));
+
+        //draw x arrow
+        this.manager.drawLine(xArrow.fromPoint, xArrow.toPoint);
+        xArrow.arrowPoints.forEach(([left, middle, right]) => {
+            this.manager.drawLine(left, middle);
+            this.manager.drawLine(middle, right);
+        });
+        xArrow.labelPoints.forEach(([from, to]) => this.manager.drawLine(from, to));
+
+        //draw y arrow
+        this.manager.drawLine(yArrow.fromPoint, yArrow.toPoint);
+        yArrow.arrowPoints.forEach(([left, middle, right]) => {
+            this.manager.drawLine(left, middle);
+            this.manager.drawLine(middle, right);
+        });
+        yArrow.labelPoints.forEach(([from, to]) => this.manager.drawLine(from, to));
     }
 
     /**
@@ -255,6 +278,24 @@ class App {
         //draw cone like figures
         this[symDrawConeLikeFigures](figure);
 
+    }
+
+    /**
+     * Draws a lemniscate
+     * @param lemniscateOfBernoulli
+     */
+    [symDrawLemniscate](lemniscateOfBernoulli) {
+        this.manager.drawLineFromPointsArray(lemniscateOfBernoulli.pointsArray);
+    }
+
+    /**
+     * Draws lemniscate of Bernoulli
+     * @param {LemniscateOfBernoulli} lemniscateOfBernoulli
+     */
+    drawLemniscateOfBernoulli(lemniscateOfBernoulli) {
+        this[symDrawCoordinates]();
+        
+        this[symDrawLemniscate](lemniscateOfBernoulli);
     }
 
 
