@@ -3,21 +3,98 @@ const Point = require('./point');
 const Figure = require('./figures/figure');
 const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
+const Grid = require('./grid');
+const Arrow = require('./figures/arrow');
+const Tangent = require('./figures/tangent');
 
 const symManager = Symbol('manager');
 const symDrawOuterLine = Symbol('drawOuterLine');
 const symDrawFullCircles = Symbol('drawFullCircles');
 const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
 const symDrawSizes = Symbol('drawSize');
-const convertToAffine = Symbol('convertToAffine');
-const convertToProjective = Symbol('convertToProjective');
+const symShouldBeConverted = Symbol('shouldBeConverted');
+const symShouldBeRotated = Symbol('shouldBeRotated');
+const symDrawCoordinates = Symbol('shouldBeConverted');
+const symDrawLemniscate = Symbol('drawLemniscate');
+const GRID_STEP = 200;
+
+/**
+ * Converts a point to affine
+ * @param {Point} p - point to be converted
+ * @return {Point}
+ */
+function convertToAffine(p) {
+    const { R1x, R1y, R2x, R2y } = this;
+
+    return new Point(R1x * p.x + R1y * p.y, R2x * p.x + R2y * p.y);
+}
+
+/**
+ * Converts a point to a projective
+ * @param {Point} p - point to be converted
+ * @return {Point}
+ */
+function convertToProjective(p) {
+    const { RxP, RyP, xWeight, yWeight, zWeight } = this;
+
+    const resX
+        = (xWeight * p.x * RxP.x + yWeight * p.y * RxP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
+    const resY
+        = (xWeight * p.x * RyP.x + yWeight * p.y * RyP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
+
+    return new Point(resX, resY);
+}
+
+/**
+ * Rotates point on specified angle
+ * @param {Point} p
+ * @returns {Point}
+ */
+function rotatePoint(p) {
+    const { angle, center } = this;
+
+    const x = (p.x - center.x) * Math.cos(angle) - (p.y - center.y) * Math.sin(angle) + center.x;
+    const y = (p.x - center.x) * Math.sin(angle) + (p.y - center.y) * Math.cos(angle) + center.y;
+    return new Point(x, y);
+}
 
 class App {
     /**
      * @param {CanvasManager} manager
+     * @param {Affine} affine
+     * @param {Projective} projective
+     * @param {Rotation} rotation
      */
-    constructor(manager) {
+    constructor(manager, affine, projective, rotation) {
         this[symManager] = manager;
+
+        let shouldBeConverted = null;
+        let shouldBeRotated = null;
+
+        if (affine) {
+            shouldBeConverted = convertToAffine.bind(affine);
+        }
+
+        if (projective) {
+            shouldBeConverted = convertToProjective.bind(projective);
+        }
+
+        if (rotation) {
+            shouldBeRotated = rotatePoint.bind(rotation);
+        }
+
+        Object.assign(this, {
+            [symShouldBeConverted]: shouldBeConverted,
+            [symShouldBeRotated]: shouldBeRotated
+        })
+    }
+
+    get shouldBeConverted() {
+        return this[symShouldBeConverted];
+    }
+
+    get shouldBeRotated() {
+        return this[symShouldBeRotated];
     }
 
     get manager() {
@@ -33,12 +110,41 @@ class App {
         const upperArc = new Arc(center, R, -90 - alpha / 2, -90 + alpha / 2);
         const bottomArc = new Arc(center, R, 90 - alpha / 2, 90 + alpha / 2);
 
+        console.log('Before');
+        console.log(upperArc.pointsArray);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            upperArc.convertPoints(this.shouldBeConverted);
+            bottomArc.convertPoints(this.shouldBeConverted);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            upperArc.convertPoints(this.shouldBeRotated);
+            bottomArc.convertPoints(this.shouldBeRotated);
+        }
+
+        console.log('After');
+        console.log(upperArc.pointsArray);
         this.manager.drawLineFromPointsArray(upperArc.pointsArray);
         this.manager.drawLineFromPointsArray(bottomArc.pointsArray);
 
         //draw side lines
-        const leftUnion = new Point(center.x - K, center.y);
-        const rightUnion = new Point(center.x + K, center.y);
+        let leftUnion = new Point(center.x - K, center.y);
+        let rightUnion = new Point(center.x + K, center.y);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            leftUnion = this.shouldBeConverted(leftUnion);
+            rightUnion = this.shouldBeConverted(rightUnion);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            leftUnion = this.shouldBeRotated(leftUnion);
+            rightUnion = this.shouldBeRotated(rightUnion);
+        }
 
         this.manager.drawLine(leftUnion, upperArc.startPoint);
         this.manager.drawLine(leftUnion, bottomArc.endPoint);
@@ -57,12 +163,27 @@ class App {
         const circleTop = new Circle(new Point(center.x, center.y - L), r);
         const circleMiddle = new Circle(new Point(center.x, center.y), r);
 
+        //fixme
+        if (this.shouldBeConverted) {
+            circleBottom.convertPoints(this.shouldBeConverted);
+            circleTop.convertPoints(this.shouldBeConverted);
+            circleMiddle.convertPoints(this.shouldBeConverted);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            circleBottom.convertPoints(this.shouldBeRotated);
+            circleTop.convertPoints(this.shouldBeRotated);
+            circleMiddle.convertPoints(this.shouldBeRotated);
+        }
+
         this.manager.drawLineFromPointsArray(circleBottom.pointsArray);
         this.manager.drawLineFromPointsArray(circleTop.pointsArray);
         this.manager.drawLineFromPointsArray(circleMiddle.pointsArray);
 
-        this.manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
-        this.manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
+        //TODO: uncomment when there is possible to draw under angle
+        // this.manager.drawHorizontalBarDottedLine(circleTop.center, r + 20);
+        // this.manager.drawHorizontalBarDottedLine(circleBottom.center, r + 20);
     }
 
     /**
@@ -74,6 +195,18 @@ class App {
         const rightHalfCircle = new Arc(new Point(center.x + (l + r), center.y), rK, -90, 90);
         const leftHalfCircle = new Arc(new Point(center.x - (l + r), center.y), rK, 90, 270);
 
+        //fixme
+        if (this.shouldBeConverted) {
+            rightHalfCircle.convertPoints(this.shouldBeConverted);
+            leftHalfCircle.convertPoints(this.shouldBeConverted);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            rightHalfCircle.convertPoints(this.shouldBeRotated);
+            leftHalfCircle.convertPoints(this.shouldBeRotated);
+        }
+
         this.manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
         this.manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
 
@@ -82,8 +215,20 @@ class App {
         this.manager.drawLine(leftHalfCircle.startPoint, leftHalfCircle.endPoint);
 
         //finish triangles from half-circles to the center circle
-        const centerCircleLeftPoint = new Point(center.x - r, center.y);
-        const centerCircleRightPoint = new Point(center.x + r, center.y);
+        let centerCircleLeftPoint = new Point(center.x - r, center.y);
+        let centerCircleRightPoint = new Point(center.x + r, center.y);
+
+        //fixme
+        if (this.shouldBeConverted) {
+            centerCircleLeftPoint = this.shouldBeConverted(centerCircleLeftPoint);
+            centerCircleRightPoint = this.shouldBeConverted(centerCircleRightPoint);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            centerCircleLeftPoint = this.shouldBeRotated(centerCircleLeftPoint);
+            centerCircleRightPoint = this.shouldBeRotated(centerCircleRightPoint);
+        }
 
         this.manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
         this.manager.drawLine(leftHalfCircle.endPoint, centerCircleLeftPoint);
@@ -124,62 +269,62 @@ class App {
         this.manager.drawSizeForAngle(center, R, 90 - alpha / 2, 90 + alpha / 2, 20, alpha);
     }
 
+    [symDrawCoordinates]() {
+        const grid = new Grid(this.manager.canvasWidth, this.manager.canvasHeight, GRID_STEP);
+
+        const xArrow = new Arrow(new Point(0, 10), new Point(30, 10), 'x');
+        const yArrow = new Arrow(new Point(10, 0), new Point(10, 30), 'y');
+
+        //fixme
+        if (this.shouldBeConverted) {
+            grid.convertPoints(this.shouldBeConverted);
+            xArrow.convertPoints(this.shouldBeConverted);
+            yArrow.convertPoints(this.shouldBeConverted);
+        }
+
+        this.manager.lineWidth = 1;
+        grid.pointsTupletsArray.forEach(({from, to}) => this.manager.drawLine(from, to));
+
+        //draw x arrow
+        this.manager.drawLine(xArrow.fromPoint, xArrow.toPoint);
+        xArrow.arrowPoints.forEach(([left, middle, right]) => {
+            this.manager.drawLine(left, middle);
+            this.manager.drawLine(middle, right);
+        });
+        xArrow.labelPoints.forEach(([from, to]) => this.manager.drawLine(from, to));
+
+        //draw y arrow
+        this.manager.drawLine(yArrow.fromPoint, yArrow.toPoint);
+        yArrow.arrowPoints.forEach(([left, middle, right]) => {
+            this.manager.drawLine(left, middle);
+            this.manager.drawLine(middle, right);
+        });
+        yArrow.labelPoints.forEach(([from, to]) => this.manager.drawLine(from, to));
+    }
+
     /**
      * Draws a figure
      * @param {Figure} figure
      */
     drawFigure(figure) {
 
+        // this.manager.drawCoordinates();
+        this[symDrawCoordinates]();
+
         if (!figure || !(figure instanceof Figure)) {
             throw new Error('figure of type Figure required!')
         }
 
-        const {center, R} = figure;
+        const { center, R } = figure;
 
         if (figure.sizesNeeded) {
             //draw sizes
             this[symDrawSizes](figure);
         }
 
-        if (figure.affinePoint) {
-            const {R1x, R1y, R2x, R2y} = figure;
-
-            /**
-             * Converts a point to affine
-             * @param {Point} p - point to be converted
-             * @return {Point}
-             */
-            const convertToAffine = (p) => {
-                return new Point(R1x * p.x + R1y * p.y, R2x * p.x + R2y * p.y);
-            };
-
-            //convert affine point
-            figure = figure.convertEachPoint(convertToAffine);
-        }
-
-        if (figure.projectivePoint) {
-            const {RxP, RyP, xWeight, yWeight, zWeight} = figure;
-
-            /**
-             * Converts a point to a projective
-             * @param {Point} p - point to be converted
-             * @return {Point}
-             */
-            const convertToProjective = (p) => {
-                const resX
-                    = (xWeight * p.x * RxP.x + yWeight * p.y * RxP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
-                const resY
-                    = (xWeight * p.x * RyP.x + yWeight * p.y * RyP.y) / (zWeight + xWeight * p.x + yWeight * p.y);
-
-                return new Point(resX, resY);
-            };
-
-            //convert projective point
-            figure = figure.convertEachPoint(convertToProjective);
-        }
-
-        this.manager.drawVerticalBarDottedLine(center, R + 20);
-        this.manager.drawHorizontalBarDottedLine(center, R + 20);
+        //TODO: uncomment this and draw dotted lines under angle
+        // this.manager.drawVerticalBarDottedLine(center, R + 20);
+        // this.manager.drawHorizontalBarDottedLine(center, R + 20);
 
         //draw outer arcs and side lines
         this[symDrawOuterLine](figure);
@@ -190,6 +335,33 @@ class App {
         //draw cone like figures
         this[symDrawConeLikeFigures](figure);
 
+    }
+
+    /**
+     * Draws a lemniscate
+     * @param lemniscateOfBernoulli
+     */
+    [symDrawLemniscate](lemniscateOfBernoulli) {
+        //fixme
+        if (this.shouldBeRotated) {
+            lemniscateOfBernoulli.convertPoints(this.shouldBeRotated);
+        }
+
+        this.manager.drawLineFromPointsArray(lemniscateOfBernoulli.pointsArray);
+    }
+
+    /**
+     * Draws lemniscate of Bernoulli
+     * @param {LemniscateOfBernoulli} lemniscateOfBernoulli
+     */
+    drawLemniscateOfBernoulli(lemniscateOfBernoulli) {
+        this[symDrawCoordinates]();
+
+        this[symDrawLemniscate](lemniscateOfBernoulli);
+
+        const tangent = new Tangent(100, lemniscateOfBernoulli.c);
+
+        this.manager.drawLineFromPointsArray(tangent.points);
     }
 
 

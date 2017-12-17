@@ -7,25 +7,60 @@
     <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <img id="variant-image" src="variant-9.png" alt="Variant 9" width="400" height="400">
     <div class="alert alert-danger" role="alert" id="errors"></div>
+    <select name="lab" id="lab" value="lab1">
+        <option value="lab1">lab1</option>
+        <option value="lab2">lab2</option>
+    </select>
+    <div id="lab1">
+        <img id="variant-image" src="variant-9.png" alt="Variant 9" width="400" height="400">
+        <form id="my-form">
+            xCenter: <input type="number" name="xCenter" id="xCenter"/>
+            yCenter: <input type="number" name="yCenter" id="yCenter"/><br/>
+            R: <input type="number" name="R" id="R1"/>
+            alpha: <input type="number" name="alpha" id="alpha"/><br/>
+            l: <input type="number" name="l" id="l1"/>
+            L: <input type="number" name="L" id="L2"/><br/>
+            r: <input type="number" name="r" id="r2"/>
+            rK: <input type="number" name="rK" id="rK"/><br/>
+            K: <input type="number" name="K" id="K"/>
+            Rotation angle: <input type="number" name="rotationAngle" id="rotationAngle"/>
+            Sizes: <input type="checkbox" id="sizes"/> <br/>
+            <div id="affine">
+                Rx1: <input type="text" name="Rx1" id="Rx1"/>
+                Ry1: <input type="text" name="Ry1" id="Ry1"/><br/>
+                Rx2: <input type="text" name="Rx2" id="Rx2"/>
+                Ry2: <input type="text" name="Ry2" id="Ry2"/><br/>
+            </div>
+            <div id="projective">
+                RxP x: <input type="text" name="RxPx" id="RxPx"/>
+                RxP y: <input type="text" name="RxPy" id="RxPy"/>
+                RyP x: <input type="text" name="RyPx" id="RyPx"/>
+                RyP y: <input type="text" name="RyPy" id="RyPy"/>
+                xWeight: <input type="text" name="xWeight" id="xWeight"/><br/>
+                yWeight: <input type="text" name="yWeight" id="yWeight"/>
+                zWeight: <input type="text" name="zWeight" id="zWeight"/><br/>
+            </div>
+            <button type="submit">Draw</button>
+        </form>
+
+        <button id="test-data">Test data</button>
+        <button id="show-affine">Affine</button>
+        <button id="show-projective">Projective</button>
+        <button id="show-img">Show/Hide img</button>
+    </div>
+    <div id="lab2">
+        <form id="my-form2">
+            xCenter: <input type="number" name="xCenter" id="l2xCenter"/>
+            yCenter: <input type="number" name="yCenter" id="l2yCenter"/><br/>
+            c: <input type="number" name="c" id="c"/>
+            rotationAngle: <input type="number" name="angleRotation" id="angleRotation"/>
+            <button type="submit">Draw</button>
+        </form>
+        <button id="l2-test-data">Test data</button>
+    </div>
     <canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
     </canvas>
-    <form id="my-form">
-        xCenter: <input type="number" name="xCenter" id="xCenter"/>
-        yCenter: <input type="number" name="yCenter" id="yCenter"/><br/>
-        R: <input type="number" name="R" id="R1"/>
-        alpha: <input type="number" name="alpha" id="alpha"/><br/>
-        l: <input type="number" name="l" id="l1"/>
-        L: <input type="number" name="L" id="L2"/><br/>
-        r: <input type="number" name="r" id="r2"/>
-        rK: <input type="number" name="rK" id="rK"/><br/>
-        K: <input type="number" name="K" id="K"/>
-        Sizes: <input type="checkbox" id="sizes"/>
-        <button type="submit">Draw</button>
-    </form>
-    <button id="test-data">Test data</button>
-    <button id="show-img">Show/Hide img</button>
     <script src="build/public/app.bundle.js"></script>
 </body>
 </html>
