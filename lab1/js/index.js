@@ -19,7 +19,7 @@ canvas.setAttribute('height', String(height));
 const $lab1 = $('div#lab1');
 const $lab2 = $('div#lab2');
 
-$lab2.hide();
+$lab1.hide();
 
 const $form1 = $('div#lab1 #my-form');
 const $form2 = $('div#lab2 #my-form2');
@@ -93,8 +93,8 @@ $btnTestData.click(() => {
 
 $l2btnTestData.click(() => {
     const testData = {
-        l2xCenter: 350,
-        l2yCenter: 350,
+        l2xCenter: 0,
+        l2yCenter: 0,
         c: 150
     };
 
