@@ -4,6 +4,7 @@ const Figure = require('./figures/figure');
 const LemniscateOfBernoulli = require('./figures/lemniscate-of-bernoulli');
 const Point = require('./point');
 const CanvasManager = require('./canvas-manager');
+const CanvasManager2 = require('./canvas-manager2');
 const App = require('./app');
 const Affine = require('./affine');
 const Projective = require('./projective');
@@ -189,14 +190,14 @@ $form2.submit(e => {
     $errors.empty();
     $errors.hide();
 
-    const canvasManager = new CanvasManager(canvas);
-    canvasManager.clearCanvas();
-
     try {
         const lemniscateOfBernoulli = LemniscateOfBernoulli.Builder
             .center(new Point(data.xCenter, data.yCenter))
             .c(data.c)
             .build();
+
+        const canvasManager2 = new CanvasManager2(canvas);
+        canvasManager2.clearCanvas();
 
         let rotation = null;
 
@@ -204,7 +205,7 @@ $form2.submit(e => {
             rotation = new Rotation(data.angleRotation, data.xCenter, data.yCenter);
         }
 
-        const app = new App(canvasManager, null, null, rotation);
+        const app = new App(canvasManager2, null, null, rotation);
 
         app.drawLemniscateOfBernoulli(lemniscateOfBernoulli);
     } catch (e) {

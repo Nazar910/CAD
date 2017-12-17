@@ -272,8 +272,8 @@ class App {
     [symDrawCoordinates]() {
         const grid = new Grid(this.manager.canvasWidth, this.manager.canvasHeight, GRID_STEP);
 
-        const xArrow = new Arrow(new Point(0, 10), new Point(30, 10), 'x');
-        const yArrow = new Arrow(new Point(10, 0), new Point(10, 30), 'y');
+        const xArrow = new Arrow(new Point(0, 0), new Point(100, 0), 'x');
+        const yArrow = new Arrow(new Point(0, 0), new Point(0, 100), 'y');
 
         //fixme
         if (this.shouldBeConverted) {
@@ -355,13 +355,17 @@ class App {
      * @param {LemniscateOfBernoulli} lemniscateOfBernoulli
      */
     drawLemniscateOfBernoulli(lemniscateOfBernoulli) {
-        this[symDrawCoordinates]();
+        try {
+            this[symDrawCoordinates]();
 
-        this[symDrawLemniscate](lemniscateOfBernoulli);
+            this[symDrawLemniscate](lemniscateOfBernoulli);
 
-        const tangent = new Tangent(100, lemniscateOfBernoulli.c);
+            const tangent = new Tangent(100, lemniscateOfBernoulli.c);
 
-        this.manager.drawLineFromPointsArray(tangent.points);
+            this.manager.drawLineFromPointsArray(tangent.points);
+        } catch (e) {
+            debugger;
+        }
     }
 
 
