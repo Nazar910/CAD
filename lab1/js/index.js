@@ -7,6 +7,7 @@ const CanvasManager = require('./canvas-manager');
 const App = require('./app');
 const Affine = require('./affine');
 const Projective = require('./projective');
+const Rotation = require('./rotation');
 
 const width = 800;
 const height = 800;
@@ -145,6 +146,7 @@ $form1.submit(e => {
 
         let affine = null;
         let projective = null;
+        let rotation = null;
 
         if (showAffine) {
             const { Rx1, Ry1, Rx2, Ry2 } = data;
@@ -159,9 +161,14 @@ $form1.submit(e => {
                 xWeight, yWeight, zWeight)
         }
 
+        if (data.rotationAngle) {
+            rotation = new Rotation(data.rotationAngle, data.xCenter, data.yCenter);
+        }
+
         const app = new App(canvasManager,
             affine,
-            projective
+            projective,
+            rotation
             // new Affine(0.5, 0, 0.5, 0.5),
             // new Projective(new Point(1000, 3), new Point(6, 900), 2.5, 1.5, 500)
         );
@@ -191,7 +198,13 @@ $form2.submit(e => {
             .c(data.c)
             .build();
 
-        const app = new App(canvasManager);
+        let rotation = null;
+
+        if (data.angleRotation) {
+            rotation = new Rotation(data.angleRotation, data.xCenter, data.yCenter);
+        }
+
+        const app = new App(canvasManager, null, null, rotation);
 
         app.drawLemniscateOfBernoulli(lemniscateOfBernoulli);
     } catch (e) {

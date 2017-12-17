@@ -5,6 +5,7 @@ const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
 const Grid = require('./grid');
 const Arrow = require('./figures/arrow');
+const Tangent = require('./figures/tangent');
 
 const symManager = Symbol('manager');
 const symDrawOuterLine = Symbol('drawOuterLine');
@@ -12,6 +13,7 @@ const symDrawFullCircles = Symbol('drawFullCircles');
 const symDrawConeLikeFigures = Symbol('drawConeLikesFigures');
 const symDrawSizes = Symbol('drawSize');
 const symShouldBeConverted = Symbol('shouldBeConverted');
+const symShouldBeRotated = Symbol('shouldBeRotated');
 const symDrawCoordinates = Symbol('shouldBeConverted');
 const symDrawLemniscate = Symbol('drawLemniscate');
 const GRID_STEP = 200;
@@ -43,16 +45,31 @@ function convertToProjective(p) {
     return new Point(resX, resY);
 }
 
+/**
+ * Rotates point on specified angle
+ * @param {Point} p
+ * @returns {Point}
+ */
+function rotatePoint(p) {
+    const { angle, center } = this;
+
+    const x = (p.x - center.x) * Math.cos(angle) - (p.y - center.y) * Math.sin(angle) + center.x;
+    const y = (p.x - center.x) * Math.sin(angle) + (p.y - center.y) * Math.cos(angle) + center.y;
+    return new Point(x, y);
+}
+
 class App {
     /**
      * @param {CanvasManager} manager
      * @param {Affine} affine
      * @param {Projective} projective
+     * @param {Rotation} rotation
      */
-    constructor(manager, affine, projective) {
+    constructor(manager, affine, projective, rotation) {
         this[symManager] = manager;
 
         let shouldBeConverted = null;
+        let shouldBeRotated = null;
 
         if (affine) {
             shouldBeConverted = convertToAffine.bind(affine);
@@ -62,13 +79,22 @@ class App {
             shouldBeConverted = convertToProjective.bind(projective);
         }
 
+        if (rotation) {
+            shouldBeRotated = rotatePoint.bind(rotation);
+        }
+
         Object.assign(this, {
-            [symShouldBeConverted]: shouldBeConverted
+            [symShouldBeConverted]: shouldBeConverted,
+            [symShouldBeRotated]: shouldBeRotated
         })
     }
 
     get shouldBeConverted() {
         return this[symShouldBeConverted];
+    }
+
+    get shouldBeRotated() {
+        return this[symShouldBeRotated];
     }
 
     get manager() {
@@ -93,6 +119,12 @@ class App {
             bottomArc.convertPoints(this.shouldBeConverted);
         }
 
+        //fixme
+        if (this.shouldBeRotated) {
+            upperArc.convertPoints(this.shouldBeRotated);
+            bottomArc.convertPoints(this.shouldBeRotated);
+        }
+
         console.log('After');
         console.log(upperArc.pointsArray);
         this.manager.drawLineFromPointsArray(upperArc.pointsArray);
@@ -106,6 +138,12 @@ class App {
         if (this.shouldBeConverted) {
             leftUnion = this.shouldBeConverted(leftUnion);
             rightUnion = this.shouldBeConverted(rightUnion);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            leftUnion = this.shouldBeRotated(leftUnion);
+            rightUnion = this.shouldBeRotated(rightUnion);
         }
 
         this.manager.drawLine(leftUnion, upperArc.startPoint);
@@ -132,6 +170,13 @@ class App {
             circleMiddle.convertPoints(this.shouldBeConverted);
         }
 
+        //fixme
+        if (this.shouldBeRotated) {
+            circleBottom.convertPoints(this.shouldBeRotated);
+            circleTop.convertPoints(this.shouldBeRotated);
+            circleMiddle.convertPoints(this.shouldBeRotated);
+        }
+
         this.manager.drawLineFromPointsArray(circleBottom.pointsArray);
         this.manager.drawLineFromPointsArray(circleTop.pointsArray);
         this.manager.drawLineFromPointsArray(circleMiddle.pointsArray);
@@ -156,6 +201,12 @@ class App {
             leftHalfCircle.convertPoints(this.shouldBeConverted);
         }
 
+        //fixme
+        if (this.shouldBeRotated) {
+            rightHalfCircle.convertPoints(this.shouldBeRotated);
+            leftHalfCircle.convertPoints(this.shouldBeRotated);
+        }
+
         this.manager.drawLineFromPointsArray(rightHalfCircle.pointsArray);
         this.manager.drawLineFromPointsArray(leftHalfCircle.pointsArray);
 
@@ -171,6 +222,12 @@ class App {
         if (this.shouldBeConverted) {
             centerCircleLeftPoint = this.shouldBeConverted(centerCircleLeftPoint);
             centerCircleRightPoint = this.shouldBeConverted(centerCircleRightPoint);
+        }
+
+        //fixme
+        if (this.shouldBeRotated) {
+            centerCircleLeftPoint = this.shouldBeRotated(centerCircleLeftPoint);
+            centerCircleRightPoint = this.shouldBeRotated(centerCircleRightPoint);
         }
 
         this.manager.drawLine(leftHalfCircle.startPoint, centerCircleLeftPoint);
@@ -285,6 +342,11 @@ class App {
      * @param lemniscateOfBernoulli
      */
     [symDrawLemniscate](lemniscateOfBernoulli) {
+        //fixme
+        if (this.shouldBeRotated) {
+            lemniscateOfBernoulli.convertPoints(this.shouldBeRotated);
+        }
+
         this.manager.drawLineFromPointsArray(lemniscateOfBernoulli.pointsArray);
     }
 
@@ -294,8 +356,12 @@ class App {
      */
     drawLemniscateOfBernoulli(lemniscateOfBernoulli) {
         this[symDrawCoordinates]();
-        
+
         this[symDrawLemniscate](lemniscateOfBernoulli);
+
+        const tangent = new Tangent(100, lemniscateOfBernoulli.c);
+
+        this.manager.drawLineFromPointsArray(tangent.points);
     }
 
 

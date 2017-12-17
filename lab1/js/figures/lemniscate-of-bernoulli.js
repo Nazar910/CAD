@@ -5,6 +5,7 @@ const Point = require('../point');
 const symCenter = Symbol('center');
 const symC = Symbol('C');
 const symPointsArray = Symbol('pointsArray');
+const symConstructor = Symbol('constructor');
 
 class Builder {
     /**
@@ -38,42 +39,17 @@ class Builder {
         assert(cN, 'c is required!');
         assert(centerP, 'Point center is required!');
 
-        const lemniscateOfBernoulli = new LemniscateOfBernoulli();
-
-        Object.assign(lemniscateOfBernoulli, {
-            [symCenter]: centerP,
-            [symC]: cN
-        });
-
-        return lemniscateOfBernoulli;
+        return LemniscateOfBernoulli[symConstructor](cN, centerP);
     }
 
 }
 
 class LemniscateOfBernoulli {
-    static get Builder() {
-        return new Builder();
-    }
-
-    get center() {
-        return this[symCenter];
-    }
-
-    get c() {
-        return this[symC];
-    }
-
-    get pointsArray() {
-        const center = this[symCenter];
-        const c = this[symC];
-
+    static [symConstructor](c, center) {
         const lemniscateFormula = (x) => {
-            const innerSqrt = Math.sqrt(Math.pow(c, 4) + 4 * x * x * c * c);
-            const result = Math.abs(Math.round((innerSqrt - x * x - c * c) * 1000) / 1000);
+            const innerSqrt = Math.sqrt(Math.pow(c, 4) + 4 * x*x * c*c);
+            const result = Math.abs(Math.round((innerSqrt - x*x - c*c) * 1000) / 1000);
             const resultWithPositiveSign = Math.sqrt(result);
-            console.log('Inner sqrt', innerSqrt);
-            console.log('Result', result);
-            console.log('resultWithPositiveSign', resultWithPositiveSign);
 
             return [
                 resultWithPositiveSign,
@@ -96,7 +72,39 @@ class LemniscateOfBernoulli {
             }
         }
 
-        return topLine.concat(bottomLine.reverse());
+        const lemniscate = new this();
+
+        Object.assign(lemniscate, {
+            [symC]: c,
+            [symCenter]: center,
+            [symPointsArray]: topLine.concat(bottomLine.reverse())
+        });
+
+        return lemniscate;
+    }
+
+    static get Builder() {
+        return new Builder();
+    }
+
+    get center() {
+        return this[symCenter];
+    }
+
+    get c() {
+        return this[symC];
+    }
+
+    get pointsArray() {
+        return this[symPointsArray];
+    }
+
+    convertPoints(convertFunc) {
+        const points = this.pointsArray.map(convertFunc);
+
+        Object.assign(this, {
+            [symPointsArray]: points
+        });
     }
 }
 
