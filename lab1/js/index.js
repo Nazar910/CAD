@@ -29,6 +29,9 @@ const $l2btnTestData = $('button#l2-test-data');
 const $sizes = $('#sizes');
 const $select = $('select#lab');
 
+
+const $animate = $('button#animate');
+
 const $img = $('#variant-image');
 const $affine = $('#affine');
 const $projective = $('#projective');
@@ -191,14 +194,15 @@ $form2.submit(e => {
     $errors.hide();
 
     try {
+        const canvasManager2 = new CanvasManager2(canvas);
+        canvasManager2.clearCanvas();
+
         const lemniscateOfBernoulli = LemniscateOfBernoulli.Builder
             .center(new Point(data.xCenter, data.yCenter))
             .c(data.c)
             .build();
 
-        const canvasManager2 = new CanvasManager2(canvas);
-        canvasManager2.clearCanvas();
-
+        
         let rotation = null;
 
         if (data.angleRotation) {
@@ -206,11 +210,47 @@ $form2.submit(e => {
         }
 
         const app = new App(canvasManager2, null, null, rotation);
-
         app.drawLemniscateOfBernoulli(lemniscateOfBernoulli);
+
+        if (data.x0) {
+            app.drawTangentAndNormalToLemniscate(lemniscateOfBernoulli, data.x0);   
+        }
+
+        if (data.animate) {
+            const [$c] = $('#lab2 input#c');
+            $c.value = data.animate;
+
+            const delay = (timeout) => new Promise(resolve => setTimeout(resolve, timeout));
+
+            let incrDerc = null;
+
+            if (data.animate > data.c) {
+                incrDerc = (c) => c + 1;
+            } else if (data.animate < data.c) {
+                incrDerc = (c) => c - 1;
+            } else {
+                return;
+            }
+
+            const loop = (c) => {
+                if (c === data.animate) {
+                    return;
+                }
+
+                canvasManager2.clearCanvas();
+                const newLemniscate = LemniscateOfBernoulli.Builder
+                    .center(new Point(data.xCenter, data.yCenter))
+                    .c(c)
+                    .build();
+
+                app.drawLemniscateOfBernoulli(newLemniscate);
+                delay(50).then(() => loop(incrDerc(c))); 
+            }
+
+            loop(data.c);
+        }
     } catch (e) {
         $errors.show();
         $errors.append(`<h3>Oops we'ves got an error: <strong>${e.message}</strong></h3>`);
     }
 });
-

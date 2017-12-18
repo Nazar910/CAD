@@ -5,7 +5,7 @@ const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
 const Grid = require('./grid');
 const Arrow = require('./figures/arrow');
-const Tangent = require('./figures/tangent');
+const TangentNormal = require('./figures/tangent-normal');
 
 const symManager = Symbol('manager');
 const symDrawOuterLine = Symbol('drawOuterLine');
@@ -355,17 +355,16 @@ class App {
      * @param {LemniscateOfBernoulli} lemniscateOfBernoulli
      */
     drawLemniscateOfBernoulli(lemniscateOfBernoulli) {
-        try {
-            this[symDrawCoordinates]();
+        this[symDrawCoordinates]();
+        this[symDrawLemniscate](lemniscateOfBernoulli);
+    }
 
-            this[symDrawLemniscate](lemniscateOfBernoulli);
-
-            const tangent = new Tangent(100, lemniscateOfBernoulli.c);
-
-            this.manager.drawLineFromPointsArray(tangent.points);
-        } catch (e) {
-            debugger;
-        }
+    drawTangentAndNormalToLemniscate(lemniscateOfBernoulli, x0) {
+        const tangent = new TangentNormal(x0, lemniscateOfBernoulli);
+        this.manager.drawLineFromPointsArray(tangent.upperTangent);
+        this.manager.drawLineFromPointsArray(tangent.bottomTangent);
+        this.manager.drawLineFromPointsArray(tangent.upperNormal);
+        this.manager.drawLineFromPointsArray(tangent.bottomNormal);
     }
 
 

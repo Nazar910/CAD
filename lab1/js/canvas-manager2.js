@@ -69,9 +69,11 @@ class CanvasManager {
      * @param {Point} p2 coordinates of point2
      */
     drawLine(p1, p2) {
+        this.ctx.beginPath();
         this.ctx.moveTo(this._shiftX(p1.x), this._shiftY(p1.y));
         this.ctx.lineTo(this._shiftX(p2.x), this._shiftY(p2.y));
         this.ctx.stroke();
+        this.ctx.closePath();
     }
 
     /**
@@ -87,39 +89,6 @@ class CanvasManager {
         this.ctx.moveTo(xFrom, yFrom);
         shiftedPoints.forEach(p => this.ctx.lineTo(p.x, p.y));
         this.ctx.stroke();
-    }
-
-    drawGrid(gridStep) {
-        const grid = new Grid(this.canvasWidth, this.canvasHeight, 0, GRID_STEP);
-
-        const xArrow = new Arrow(new Point(0, 0), new Point(100, 0), 'x');
-        const yArrow = new Arrow(new Point(0, 0), new Point(0, 100), 'y');
-
-        //fixme
-        if (this.shouldBeConverted) {
-            grid.convertPoints(this.shouldBeConverted);
-            xArrow.convertPoints(this.shouldBeConverted);
-            yArrow.convertPoints(this.shouldBeConverted);
-        }
-
-        this.manager.lineWidth = 1;
-        grid.pointsTupletsArray.forEach(({from, to}) => this.manager.drawLine(from, to));
-
-        //draw x arrow
-        this.manager.drawLine(xArrow.fromPoint, xArrow.toPoint);
-        xArrow.arrowPoints.forEach(([left, middle, right]) => {
-            this.manager.drawLine(left, middle);
-            this.manager.drawLine(middle, right);
-        });
-        xArrow.labelPoints.forEach(([from, to]) => this.manager.drawLine(from, to));
-
-        //draw y arrow
-        this.manager.drawLine(yArrow.fromPoint, yArrow.toPoint);
-        yArrow.arrowPoints.forEach(([left, middle, right]) => {
-            this.manager.drawLine(left, middle);
-            this.manager.drawLine(middle, right);
-        });
-        yArrow.labelPoints.forEach(([from, to]) => this.manager.drawLine(from, to));
     }
 
     /**
