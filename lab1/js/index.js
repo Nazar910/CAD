@@ -4,6 +4,7 @@ const Figure = require('./figures/figure');
 const LemniscateOfBernoulli = require('./figures/lemniscate-of-bernoulli');
 const Point = require('./point');
 const CanvasManager = require('./canvas-manager');
+const CanvasManager2 = require('./canvas-manager2');
 const App = require('./app');
 const Affine = require('./affine');
 const Projective = require('./projective');
@@ -18,7 +19,7 @@ canvas.setAttribute('height', String(height));
 const $lab1 = $('div#lab1');
 const $lab2 = $('div#lab2');
 
-$lab2.hide();
+$lab1.hide();
 
 const $form1 = $('div#lab1 #my-form');
 const $form2 = $('div#lab2 #my-form2');
@@ -27,6 +28,9 @@ const $btnTestData = $('button#test-data');
 const $l2btnTestData = $('button#l2-test-data');
 const $sizes = $('#sizes');
 const $select = $('select#lab');
+
+
+const $animate = $('button#animate');
 
 const $img = $('#variant-image');
 const $affine = $('#affine');
@@ -92,8 +96,8 @@ $btnTestData.click(() => {
 
 $l2btnTestData.click(() => {
     const testData = {
-        l2xCenter: 350,
-        l2yCenter: 350,
+        l2xCenter: 0,
+        l2yCenter: 0,
         c: 150
     };
 
@@ -189,27 +193,64 @@ $form2.submit(e => {
     $errors.empty();
     $errors.hide();
 
-    const canvasManager = new CanvasManager(canvas);
-    canvasManager.clearCanvas();
-
     try {
+        const canvasManager2 = new CanvasManager2(canvas);
+        canvasManager2.clearCanvas();
+
         const lemniscateOfBernoulli = LemniscateOfBernoulli.Builder
             .center(new Point(data.xCenter, data.yCenter))
             .c(data.c)
             .build();
 
+        
         let rotation = null;
 
         if (data.angleRotation) {
             rotation = new Rotation(data.angleRotation, data.xCenter, data.yCenter);
         }
 
-        const app = new App(canvasManager, null, null, rotation);
-
+        const app = new App(canvasManager2, null, null, rotation);
         app.drawLemniscateOfBernoulli(lemniscateOfBernoulli);
+
+        if (data.x0) {
+            app.drawTangentAndNormalToLemniscate(lemniscateOfBernoulli, data.x0);   
+        }
+
+        if (data.animate) {
+            const [$c] = $('#lab2 input#c');
+            $c.value = data.animate;
+
+            const delay = (timeout) => new Promise(resolve => setTimeout(resolve, timeout));
+
+            let incrDerc = null;
+
+            if (data.animate > data.c) {
+                incrDerc = (c) => c + 1;
+            } else if (data.animate < data.c) {
+                incrDerc = (c) => c - 1;
+            } else {
+                return;
+            }
+
+            const loop = (c) => {
+                if (c === data.animate) {
+                    return;
+                }
+
+                canvasManager2.clearCanvas();
+                const newLemniscate = LemniscateOfBernoulli.Builder
+                    .center(new Point(data.xCenter, data.yCenter))
+                    .c(c)
+                    .build();
+
+                app.drawLemniscateOfBernoulli(newLemniscate);
+                delay(50).then(() => loop(incrDerc(c))); 
+            }
+
+            loop(data.c);
+        }
     } catch (e) {
         $errors.show();
         $errors.append(`<h3>Oops we'ves got an error: <strong>${e.message}</strong></h3>`);
     }
 });
-

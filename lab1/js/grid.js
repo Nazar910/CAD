@@ -10,21 +10,24 @@ class Grid {
     /**
      * @param {Number} width
      * @param {Number} height
+     * @param {Point} center
      * @param {Number} step
      */
-    constructor(width, height, step) {
+    constructor(width, height, center, step) {
         assert(!isNaN(width), 'width is required!');
         assert(!isNaN(height), 'height is required!');
         assert(!isNaN(step), 'step is required!');
+        assert(center , 'center point is required!');
+        assert(center instanceof Point, 'center should be instance of Point!');
 
         const points = [];
 
-        for (let x = 0; x < width; x += step) {
-            points.push(new Tuplet(new Point(x, 0), new Point(x, height)));
+        for (let x = - center.x; x < width; x += step) {
+            points.push(new Tuplet(new Point(x, - center.y), new Point(x, height)));
         }
 
-        for (let y = 0; y < height; y += step) {
-            points.push(new Tuplet(new Point(0, y), new Point(width, y)));
+        for (let y = - center.y; y < height; y += step) {
+            points.push(new Tuplet(new Point(- center.x, y), new Point(width, y)));
         }
 
         Object.assign(this, {

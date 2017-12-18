@@ -34,8 +34,8 @@ class Arrow {
                 arrowPoints.push([new Point(toP.x - 5, toP.y - 2), toP, new Point(toP.x - 5, toP.y + 2)]);
                 break;
             case 'y':
-                labelPoints.push([new Point(toP.x + 4, toP.y + 5), new Point(toP.x - 4, toP.y + 15)]);
-                labelPoints.push([new Point(toP.x - 4, toP.y + 5), new Point(toP.x, toP.y + 10)]);
+                labelPoints.push([new Point(toP.x + 4, toP.y + 15), new Point(toP.x - 4, toP.y + 5)]);
+                labelPoints.push([new Point(toP.x - 4, toP.y + 15), new Point(toP.x, toP.y + 10)]);
                 arrowPoints.push([new Point(toP.x - 2, toP.y - 5), toP, new Point(toP.x + 2, toP.y - 5)]);
                 break;
         }

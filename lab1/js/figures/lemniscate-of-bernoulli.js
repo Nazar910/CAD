@@ -95,6 +95,10 @@ class LemniscateOfBernoulli {
         return this[symC];
     }
 
+    set c(value) {
+        this[symC] = value;
+    } 
+
     get pointsArray() {
         return this[symPointsArray];
     }

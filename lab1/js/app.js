@@ -5,7 +5,7 @@ const Circle = require('./figures/circle');
 const Arc = require('./figures/arc');
 const Grid = require('./grid');
 const Arrow = require('./figures/arrow');
-const Tangent = require('./figures/tangent');
+const TangentNormal = require('./figures/tangent-normal');
 
 const symManager = Symbol('manager');
 const symDrawOuterLine = Symbol('drawOuterLine');
@@ -270,10 +270,10 @@ class App {
     }
 
     [symDrawCoordinates]() {
-        const grid = new Grid(this.manager.canvasWidth, this.manager.canvasHeight, GRID_STEP);
+        const grid = new Grid(this.manager.canvasWidth, this.manager.canvasHeight, this.manager.center, GRID_STEP);
 
-        const xArrow = new Arrow(new Point(0, 10), new Point(30, 10), 'x');
-        const yArrow = new Arrow(new Point(10, 0), new Point(10, 30), 'y');
+        const xArrow = new Arrow(new Point(0, 0), new Point(100, 0), 'x');
+        const yArrow = new Arrow(new Point(0, 0), new Point(0, 100), 'y');
 
         //fixme
         if (this.shouldBeConverted) {
@@ -356,12 +356,15 @@ class App {
      */
     drawLemniscateOfBernoulli(lemniscateOfBernoulli) {
         this[symDrawCoordinates]();
-
         this[symDrawLemniscate](lemniscateOfBernoulli);
+    }
 
-        const tangent = new Tangent(100, lemniscateOfBernoulli.c);
-
-        this.manager.drawLineFromPointsArray(tangent.points);
+    drawTangentAndNormalToLemniscate(lemniscateOfBernoulli, x0) {
+        const tangent = new TangentNormal(x0, lemniscateOfBernoulli);
+        this.manager.drawLineFromPointsArray(tangent.upperTangent);
+        this.manager.drawLineFromPointsArray(tangent.bottomTangent);
+        this.manager.drawLineFromPointsArray(tangent.upperNormal);
+        this.manager.drawLineFromPointsArray(tangent.bottomNormal);
     }
 
 

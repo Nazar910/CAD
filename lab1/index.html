@@ -8,9 +8,9 @@
 </head>
 <body>
     <div class="alert alert-danger" role="alert" id="errors"></div>
-    <select name="lab" id="lab" value="lab1">
+    <select name="lab" id="lab">
         <option value="lab1">lab1</option>
-        <option value="lab2">lab2</option>
+        <option value="lab2" selected="selected">lab2</option>
     </select>
     <div id="lab1">
         <img id="variant-image" src="variant-9.png" alt="Variant 9" width="400" height="400">
@@ -55,9 +55,11 @@
             yCenter: <input type="number" name="yCenter" id="l2yCenter"/><br/>
             c: <input type="number" name="c" id="c"/>
             rotationAngle: <input type="number" name="angleRotation" id="angleRotation"/>
+            x0 tangent/normal: <input type="text" name="x0" id="x0"/><br/>
+            animate: <input type="number" name="animate" id="animate"/><br/>
             <button type="submit">Draw</button>
         </form>
-        <button id="l2-test-data">Test data</button>
+        <button id="l2-test-data">Test data</button><br/>
     </div>
     <canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
     </canvas>
