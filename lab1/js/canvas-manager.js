@@ -12,10 +12,15 @@ class CanvasManager {
      */
     constructor(canvas) {
 
+        this._center = new Point(canvas.width * 0.5, canvas.height * 0.5);
         Object.assign(this, {
             [symCanvas]: canvas,
             [symCtx]: canvas.getContext('2d')
         });
+    }
+
+    get center() {
+        return this._center;
     }
 
     get ctx() {
